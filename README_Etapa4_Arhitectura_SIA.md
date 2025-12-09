@@ -405,31 +405,31 @@ proiect-rn-[nume-prenume]/
 ## Checklist Final – Bifați Totul Înainte de Predare
 
 ### Documentație și Structură
-- [ ] Tabelul Nevoie → Soluție → Modul complet (minimum 2 rânduri cu exemple concrete completate in README_Etapa4_Arhitectura_SIA.md)
-- [ ] Declarație contribuție 40% date originale completată în README_Etapa4_Arhitectura_SIA.md
-- [ ] Cod generare/achiziție date funcțional și documentat
-- [ ] Dovezi contribuție originală: grafice + log + statistici în `docs/`
-- [ ] Diagrama State Machine creată și salvată în `docs/state_machine.*`
-- [ ] Legendă State Machine scrisă în README_Etapa4_Arhitectura_SIA.md (minimum 1-2 paragrafe cu justificare)
-- [ ] Repository structurat conform modelului de mai sus (verificat consistență cu Etapa 3)
+- [x] Tabelul Nevoie → Soluție → Modul complet (minimum 2 rânduri cu exemple concrete completate in README_Etapa4_Arhitectura_SIA.md)
+- [x] Declarație contribuție 40% date originale completată în README_Etapa4_Arhitectura_SIA.md
+- [x] Cod generare/achiziție date funcțional și documentat
+- [x] Dovezi contribuție originală: grafice + log + statistici în `docs/`
+- [x] Diagrama State Machine creată și salvată în `docs/state_machine.*`
+- [x] Legendă State Machine scrisă în README_Etapa4_Arhitectura_SIA.md (minimum 1-2 paragrafe cu justificare)
+- [x] Repository structurat conform modelului de mai sus (verificat consistență cu Etapa 3)
 
 ### Modul 1: Data Logging / Acquisition
-- [ ] Cod rulează fără erori (`python src/data_acquisition/...` sau echivalent LabVIEW)
-- [ ] Produce minimum 40% date originale din dataset-ul final
-- [ ] CSV generat în format compatibil cu preprocesarea din Etapa 3
-- [ ] Documentație în `src/data_acquisition/README.md` cu:
-  - [ ] Metodă de generare/achiziție explicată
-  - [ ] Parametri folosiți (frecvență, durată, zgomot, etc.)
-  - [ ] Justificare relevanță date pentru problema voastră
-- [ ] Fișiere în `data/generated/` conform structurii
+- [x] Cod rulează fără erori (`python src/data_acquisition/...` sau echivalent LabVIEW)
+- [x] Produce minimum 40% date originale din dataset-ul final
+- [x] CSV generat în format compatibil cu preprocesarea din Etapa 3
+- [x] Documentație în `src/data_acquisition/README.md` cu:
+  - [x] Metodă de generare/achiziție explicată
+  - [x] Parametri folosiți (frecvență, durată, zgomot, etc.)
+  - [x] Justificare relevanță date pentru problema voastră
+- [x] Fișiere în `data/generated/` conform structurii
 
 ### Modul 2: Neural Network
-- [ ] Arhitectură RN definită și documentată în cod (docstring detaliat) - versiunea inițială 
-- [ ] README în `src/neural_network/` cu detalii arhitectură curentă
+- [x] Arhitectură RN definită și documentată în cod (docstring detaliat) - versiunea inițială 
+- [x] README în `src/neural_network/` cu detalii arhitectură curentă
 
 ### Modul 3: Web Service / UI
-- [ ] Propunere Interfață ce pornește fără erori (comanda de lansare testată)
-- [ ] Screenshot demonstrativ în `docs/screenshots/ui_demo.png`
+- [x] Propunere Interfață ce pornește fără erori (comanda de lansare testată)
+- [x] Screenshot demonstrativ în `docs/screenshots/ui_demo.png`
 - [ ] README în `src/app/` cu instrucțiuni lansare (comenzi exacte)
 
 ---
