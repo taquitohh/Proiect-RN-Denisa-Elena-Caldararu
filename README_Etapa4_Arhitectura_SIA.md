@@ -246,47 +246,69 @@ Chiar dacă aplicația voastră este o clasificare simplă (user upload → clas
 
 ### ✅ Justificarea State Machine-ului ales (COMPLETAT):
 
-**Diagrama:** `docs/state_machine.png` (de creat)
+**Diagrama:** `docs/state_machine.png`
 
 Am ales arhitectura **clasificare la cerere (on-demand inference)** pentru că proiectul Text-to-Blender procesează comenzi text individuale de la utilizator și returnează cod Python instantaneu.
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                     STATE MACHINE - Text to Blender                │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                     │
-│    ┌──────┐         ┌────────────┐         ┌──────────────┐        │
-│    │ IDLE │────────►│ RECEIVE    │────────►│ VALIDATE     │        │
-│    │      │  user   │ INPUT      │  text   │ INPUT        │        │
-│    └──────┘  input  └────────────┘  ok     └──────────────┘        │
-│        ▲                                          │                │
-│        │                                    valid │ invalid        │
-│        │                                          ▼                │
-│        │    ┌────────────┐         ┌──────────────────┐            │
-│        │    │ DISPLAY    │◄────────│ CLASSIFY_INTENT  │            │
-│        │    │ OUTPUT     │  done   │ (Neural Network) │            │
-│        │    └────────────┘         └──────────────────┘            │
-│        │          │                         │                      │
-│        │          │                         ▼                      │
-│        │          │                ┌──────────────────┐            │
-│        │          │                │ EXTRACT_PARAMS   │            │
-│        │          │                │ (Regex/NLP)      │            │
-│        │          │                └──────────────────┘            │
-│        │          │                         │                      │
-│        │          │                         ▼                      │
-│        │          │                ┌──────────────────┐            │
-│        │          └───────────────►│ GENERATE_CODE    │            │
-│        │                           │ (Templates)      │            │
-│        │                           └──────────────────┘            │
-│        │                                    │                      │
-│        │                              error │                      │
-│        │                                    ▼                      │
-│        │                           ┌──────────────────┐            │
-│        └───────────────────────────│ ERROR_HANDLER    │            │
-│                     retry/reset    │ (Log + Fallback) │            │
-│                                    └──────────────────┘            │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                      STATE MACHINE - Text to Blender                          ║
+╠═══════════════════════════════════════════════════════════════════════════════╣
+║                                                                               ║
+║   ┌────────────┐    user input    ┌────────────┐    text ok    ┌──────────┐  ║
+║   │            │─────────────────►│  RECEIVE   │──────────────►│ VALIDATE │  ║
+║   │    IDLE    │                  │   INPUT    │               │  INPUT   │  ║
+║   │            │◄─────────────────┤            │               │          │  ║
+║   └────────────┘   new request    └────────────┘               └──────────┘  ║
+║         ▲                                                           │        ║
+║         │                                              ┌────────────┴───┐    ║
+║         │                                              │                │    ║
+║         │                                          valid            invalid  ║
+║         │                                              │                │    ║
+║         │                                              ▼                │    ║
+║         │                                      ┌──────────────┐         │    ║
+║         │                                      │  CLASSIFY    │         │    ║
+║         │                                      │   INTENT     │         │    ║
+║         │                                      │   (RN)       │         │    ║
+║         │                                      └──────────────┘         │    ║
+║         │                                              │                │    ║
+║         │                                         classified            │    ║
+║         │                                              │                │    ║
+║         │                                              ▼                │    ║
+║         │                                      ┌──────────────┐         │    ║
+║         │                                      │   EXTRACT    │         │    ║
+║         │                                      │   PARAMS     │         │    ║
+║         │                                      │  (Regex/NLP) │         │    ║
+║         │                                      └──────────────┘         │    ║
+║         │                                              │                │    ║
+║         │                                          extracted            │    ║
+║         │                                              │                │    ║
+║         │                                              ▼                │    ║
+║         │                                      ┌──────────────┐         │    ║
+║         │                                      │  GENERATE    │         │    ║
+║         │                                      │    CODE      │         │    ║
+║         │                                      │ (Templates)  │         │    ║
+║         │                                      └──────────────┘         │    ║
+║         │                                              │                │    ║
+║         │                                    ┌─────────┴─────────┐      │    ║
+║         │                                    │                   │      │    ║
+║         │                                 success              error    │    ║
+║         │                                    │                   │      │    ║
+║         │                                    ▼                   ▼      │    ║
+║         │                            ┌──────────────┐    ┌──────────────┐    ║
+║         │          done              │   DISPLAY    │    │    ERROR     │◄───┘
+║         └────────────────────────────│   OUTPUT     │    │   HANDLER    │    ║
+║                                      │              │    │              │    ║
+║                                      └──────────────┘    └──────────────┘    ║
+║                                                                 │            ║
+║                                                            retry/reset       ║
+║                                                                 │            ║
+║                                      ┌──────────────────────────┘            ║
+║                                      │                                       ║
+║                                      ▼                                       ║
+║                               (revine la IDLE)                               ║
+║                                                                               ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
 ```
 
 **Stările principale sunt:**
@@ -430,7 +452,7 @@ proiect-rn-[nume-prenume]/
 ### Modul 3: Web Service / UI
 - [x] Propunere Interfață ce pornește fără erori (comanda de lansare testată)
 - [x] Screenshot demonstrativ în `docs/screenshots/ui_demo.png`
-- [ ] README în `src/app/` cu instrucțiuni lansare (comenzi exacte)
+- [x] README în `src/app/` cu instrucțiuni lansare (comenzi exacte)
 
 ---
 
