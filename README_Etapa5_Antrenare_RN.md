@@ -2,9 +2,9 @@
 
 **Disciplina:** Rețele Neuronale  
 **Instituție:** POLITEHNICA București – FIIR  
-**Student:** Popa Denis-Alexandru  
+**Student:** Căldăraru Denisa-Elena  
 **Link Repository GitHub:** https://github.com/taquitohh/Proiect_RN  
-**Data predării:** 16 Decembrie 2024
+**Data predării:** 16 Decembrie 2025
 
 ---
 
