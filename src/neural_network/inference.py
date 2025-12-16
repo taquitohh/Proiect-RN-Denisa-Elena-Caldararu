@@ -83,14 +83,14 @@ class BlenderIntentClassifier:
             # Import lazy pentru a evita circular imports
             from neural_network.model import NeuralNetwork
             
-            # Creare model cu aceeași arhitectură
+            # Creare model cu aceeași arhitectură ca în train_optimized.py
             self.model = NeuralNetwork(
                 input_size=self.vocab_size,
-                hidden_layers=[128, 64, 32],
+                hidden_layers=[128, 64],  # Actualizat conform train_optimized.py
                 output_size=self.num_classes,
                 activation='relu',
                 output_activation='softmax',
-                dropout=0.2
+                dropout=0.3  # Actualizat conform train_optimized.py
             )
             
             # Încărcare weights

@@ -5,11 +5,11 @@ model:
   # Arhitectura
   architecture:
     input_size: null  # Va fi determinat automat din date
-    hidden_layers: [128, 64, 32]
+    hidden_layers: [128, 64]
     output_size: null  # Va fi determinat automat din date
     activation: "relu"
     output_activation: "softmax"  # "softmax" pentru clasificare, "linear" pentru regresie
-    dropout: 0.2
+    dropout: 0.3
   
   # Tip problemă
   problem_type: "classification"  # "classification" sau "regression"
