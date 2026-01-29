@@ -1,20 +1,4 @@
 {
-  "test_accuracy": 0.8034188034188035,
-  "test_f1_macro": 0.689723383257866,
-  "train_accuracy": 0.9787234042553191,
-  "val_accuracy": 0.7948717948717948,
-  "epochs_trained": 56,
-  "best_val_loss": 0.9608448836952448,
-  "features_used": {
-    "early_stopping": true,
-    "lr_scheduler": "ReduceLROnPlateau",
-    "augmentation": "30.0%",
-    "weight_decay": 0.0001
-  },
-  "onnx_benchmark": {
-    "avg_ms": 0.020189999895592337,
-    "min_ms": 0.018899999304267112,
-    "max_ms": 0.03370000013092067,
-    "p95_ms": 0.02395999936197767
-  }
+  "accuracy": 0.9906666666666667,
+  "f1_macro": 0.9900868373334625
 }
