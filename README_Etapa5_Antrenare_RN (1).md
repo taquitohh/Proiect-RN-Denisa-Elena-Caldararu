@@ -3,7 +3,7 @@
 **Disciplina:** Rețele Neuronale  
 **Instituție:** POLITEHNICA București – FIIR  
 **Student:** Caldararu Denisa  
-**Link Repository GitHub:** [URL complet]  
+**Link Repository GitHub:** https://github.com/taquitohh/Proiect_RN  
 **Data predării:** 10.01.2026
 
 ---
@@ -61,13 +61,14 @@ optimizările ulterioare din Etapa 6.
 
 Exemplu:
 ```bash
-# 1. Combinare date vechi (Etapa 3) + noi (Etapa 4)
-python src/preprocessing/combine_datasets.py
-
-# 2. Refacere preprocesare COMPLETĂ
+# 1. Curățare date
 python src/preprocessing/data_cleaner.py
-python src/preprocessing/feature_engineering.py
-python src/preprocessing/data_splitter.py --stratify --random_state 42
+
+# 2. Scalare StandardScaler
+python src/preprocessing/feature_scaler.py
+
+# 3. Împărțire stratificată
+python src/preprocessing/data_splitter.py
 
 # Verificare finală:
 # data/train/ → trebuie să conțină date vechi + noi
@@ -224,7 +225,8 @@ Cauză posibilă: Features-urile IMU (gyro_z) sunt simetrice pentru viraje în d
 
 **Completați pentru proiectul vostru:**
 ```
-[Descrieți confuziile principale între clase și cauzele posibile]
+Analiza erorilor detaliate nu a fost realizată în Etapa 5.
+Au fost raportate metricile globale (Accuracy și F1 macro) pe test set.
 ```
 
 ### 2. Ce caracteristici ale datelor cauzează erori?
@@ -237,7 +239,7 @@ Modelul eșuează când zgomotul de fond depășește 40% din amplitudinea semna
 
 **Completați pentru proiectul vostru:**
 ```
-[Identificați condițiile în care modelul are performanță slabă]
+Nu au fost documentate condiții specifice de eroare în această etapă.
 ```
 
 ### 3. Ce implicații are pentru aplicația industrială?
@@ -253,7 +255,9 @@ Soluție: Ajustare threshold clasificare de la 0.5 → 0.3 pentru clasa 'defect'
 
 **Completați pentru proiectul vostru:**
 ```
-[Analizați impactul erorilor în contextul aplicației voastre și prioritizați]
+Impactul erorilor a fost notat ca risc de clasificare greșită a tipului de scaun,
+fără consecințe industriale critice. Prioritatea a fost obținerea unei acurateți
+ridicate pentru demonstrarea corectitudinii pipeline-ului end-to-end.
 ```
 
 ### 4. Ce măsuri corective propuneți?
@@ -373,19 +377,19 @@ python src/neural_network/train.py --epochs 50 --batch_size 32 --early_stopping
 ### 4. Evaluare pe test set
 
 ```bash
-python src/neural_network/evaluate.py --model models/trained_model.h5
+python src/neural_network/evaluate.py
 
 # Output așteptat:
-# Test Accuracy: 0.7823
-# Test F1-score (macro): 0.7456
+# Test Accuracy: 0.9907
+# Test F1-score (macro): 0.9901
 # ✓ Metrics saved to results/test_metrics.json
-# ✓ Confusion matrix saved to docs/confusion_matrix.png
+# ✓ Confusion matrix salvată în docs/confusion_matrix.png
 ```
 
 ### 5. Lansare UI cu model antrenat
 
 ```bash
-streamlit run src/app/main.py
+python src/app/main.py
 
 # SAU pentru LabVIEW:
 # Deschideți WebVI și rulați main.vi
@@ -422,21 +426,22 @@ streamlit run src/app/main.py
 ### Integrare UI și Demonstrație - Nivel 1 (OBLIGATORIU)
 - [x] Model ANTRENAT încărcat în UI din Etapa 4 (nu model dummy)
 - [x] UI face inferență REALĂ cu predicții corecte
-- [x] Screenshot inferență reală în `docs/screenshots/inference_real.png`
+- [ ] Screenshot inferență reală în `docs/screenshots/inference_real.png`
 - [x] Verificat: predicțiile sunt diferite față de Etapa 4 (când erau random)
 
 ### Documentație Nivel 2 (dacă aplicabil)
-- [x] Early stopping implementat și documentat în cod
-- [x] Learning rate scheduler folosit (ReduceLROnPlateau / StepLR)
-- [x] Augmentări relevante domeniu aplicate (NU rotații simple!)
-- [x] Grafic loss/val_loss salvat în `docs/loss_curve.png`
-- [x] Analiză erori în context industrial completată (4 întrebări răspunse)
+- [ ] Early stopping implementat și documentat în cod
+- [ ] Learning rate scheduler folosit (ReduceLROnPlateau / StepLR)
+- [ ] Augmentări relevante domeniu aplicate (NU rotații simple!)
+- [ ] Grafic loss/val_loss salvat în `docs/loss_curve.png`
+- [ ] Analiză erori în context industrial completată (4 întrebări răspunse)
 - [x] Metrici Nivel 2: **Accuracy ≥75%**, **F1 ≥0.70**
 
 ### Documentație Nivel 3 Bonus (dacă aplicabil)
-- [x] Comparație 2+ arhitecturi (tabel comparativ + justificare)
-- [x] Export ONNX/TFLite + benchmark latență (<50ms demonstrat)
-- [x] Confusion matrix + analiză 5 exemple greșite cu implicații
+- [x] Confusion matrix generată în `docs/confusion_matrix.png`
+- [ ] Comparație 2+ arhitecturi (tabel comparativ + justificare)
+- [ ] Export ONNX/TFLite + benchmark latență (<50ms demonstrat)
+- [ ] Confusion matrix + analiză 5 exemple greșite cu implicații
 
 ### Verificări Tehnice
 - [x] `requirements.txt` actualizat cu toate bibliotecile noi

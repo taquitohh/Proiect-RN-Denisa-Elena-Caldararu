@@ -3,7 +3,7 @@
 **Disciplina:** Rețele Neuronale  
 **Instituție:** POLITEHNICA București – FIIR  
 **Student:** Caldararu Denisa  
-**Link Repository GitHub:** [URL complet]  
+**Link Repository GitHub:** https://github.com/taquitohh/Proiect_RN  
 **Data predării:** 29.01.2026
 
 ---
@@ -12,6 +12,10 @@
 Această etapă corespunde punctelor **7. Analiza performanței și optimizarea parametrilor**, **8. Analiza și agregarea rezultatelor** și **9. Formularea concluziilor finale** din lista de 9 etape - slide 2 **RN Specificatii proiect.pdf**.
 
 **Obiectiv principal:** Maturizarea completă a Sistemului cu Inteligență Artificială (SIA) prin optimizarea modelului RN, analiza detaliată a performanței și integrarea îmbunătățirilor în aplicația software completă.
+
+**Stare actuală în repository:** Nu s-au efectuat experimentele de optimizare ale Etapei 6,
+iar modelul optimizat nu a fost generat. Proiectul a rămas la nivelul Etapei 5,
+cu modelul antrenat și aplicația funcțională.
 
 **CONTEXT IMPORTANT:** 
 - Etapa 6 **ÎNCHEIE ciclul formal de dezvoltare** al proiectului
@@ -65,7 +69,7 @@ Deși Etapa 6 încheie ciclul formal de dezvoltare, **procesul iterativ continu�
 - [x] **Tabel hiperparametri** cu justificări completat
 - [x] **`results/training_history.csv`** cu toate epoch-urile
 - [x] **UI funcțional** care încarcă modelul antrenat și face inferență reală
-- [x] **Screenshot inferență** în `docs/screenshots/inference_real.png`
+- [ ] **Screenshot inferență** în `docs/screenshots/inference_real.png`
 - [x] **State Machine** implementat conform definiției din Etapa 4
 
 **Dacă oricare din punctele de mai sus lipsește → reveniți la Etapa 5 înainte de a continua.**
@@ -96,21 +100,16 @@ Documentați **minimum 4 experimente** cu variații sistematice:
 
 | **Exp#** | **Modificare față de Baseline (Etapa 5)** | **Accuracy** | **F1-score** | **Timp antrenare** | **Observații** |
 |----------|------------------------------------------|--------------|--------------|-------------------|----------------|
-| Baseline | Configurația din Etapa 5 | 0.72 | 0.68 | 15 min | Referință |
-| Exp 1 | Learning rate 0.0001 → 0.001 | 0.74 | 0.70 | 12 min | Convergență mai rapidă |
-| Exp 2 | Batch size 32 → 64 | 0.71 | 0.67 | 10 min | Stabilitate redusă |
-| Exp 3 | +1 hidden layer (128 neuroni) | 0.76 | 0.73 | 22 min | Îmbunătățire semnificativă |
-| Exp 4 | Dropout 0.3 → 0.5 | 0.73 | 0.69 | 16 min | Reduce overfitting |
-| Exp 5 | Augmentări domeniu (zgomot gaussian) | 0.78 | 0.75 | 25 min | **BEST** - ales pentru final |
+| Baseline | Configurația din Etapa 5 | 0.9907 | 0.9901 | n/a | Metrici din `results/test_metrics.json` |
+| Exp 1 | n/a (neexecutat) | n/a | n/a | n/a | Neexecutat în acest repo |
+| Exp 2 | n/a (neexecutat) | n/a | n/a | n/a | Neexecutat în acest repo |
+| Exp 3 | n/a (neexecutat) | n/a | n/a | n/a | Neexecutat în acest repo |
+| Exp 4 | n/a (neexecutat) | n/a | n/a | n/a | Neexecutat în acest repo |
 
 **Justificare alegere configurație finală:**
 ```
-Am ales Exp 5 ca model final pentru că:
-1. Oferă cel mai bun F1-score (0.75), critic pentru aplicația noastră de [descrieți]
-2. Îmbunătățirea vine din augmentări relevante domeniului industrial (zgomot gaussian 
-   calibrat la nivelul real de zgomot din mediul de producție: SNR ≈ 20dB)
-3. Timpul de antrenare suplimentar (25 min) este acceptabil pentru beneficiul obținut
-4. Testare pe date noi arată generalizare bună (nu overfitting pe augmentări)
+Nu s-a selectat un model optimizat deoarece experimentele Etapei 6 nu au fost rulate.
+Modelul de referință a rămas cel din Etapa 5.
 ```
 
 **Resurse învățare rapidă - Optimizare:**
@@ -128,34 +127,19 @@ Am ales Exp 5 ca model final pentru că:
 
 | **Componenta** | **Stare Etapa 5** | **Modificare Etapa 6** | **Justificare** |
 |----------------|-------------------|------------------------|-----------------|
-| **Model încărcat** | `trained_model.h5` | `optimized_model.h5` | +9% accuracy, -5% FN |
-| **Threshold alertă (State Machine)** | 0.5 (default) | 0.35 (clasa 'defect') | Minimizare FN în context industrial |
-| **Stare nouă State Machine** | N/A | `CONFIDENCE_CHECK` | Filtrare predicții cu confidence <0.6 |
-| **Latență target** | 100ms | 50ms (ONNX export) | Cerință timp real producție |
-| **UI - afișare confidence** | Da/Nu simplu | Bară progres + valoare % | Feedback operator îmbunătățit |
-| **Logging** | Doar predicție | Predicție + confidence + timestamp | Audit trail complet |
-| **Web Service response** | JSON minimal | JSON extins + metadata | Integrare API extern |
+| **Model încărcat** | `trained_model.h5` | n/a (neimplementat) | Etapa 6 nu a fost executată |
+| **State Machine** | IDLE → USER_INPUT → PREPROCESS → RN_INFERENCE → SCRIPT_GENERATION → DISPLAY → IDLE | n/a (neimplementat) | Nu s-au făcut modificări |
+| **UI - afișare rezultate** | text + probabilități + script | n/a (neimplementat) | UI a rămas neschimbat |
+| **Logging** | n/a | n/a (neimplementat) | Nu s-a introdus logging suplimentar |
 
 **Completați pentru proiectul vostru:**
 ```markdown
 ### Modificări concrete aduse în Etapa 6:
 
-1. **Model înlocuit:** `models/trained_model.h5` → `models/optimized_model.h5`
-   - Îmbunătățire: Accuracy +X%, F1 +Y%
-   - Motivație: [descrieți de ce modelul optimizat e mai bun pentru aplicația voastră]
-
-2. **State Machine actualizat:**
-   - Threshold modificat: [valoare veche] → [valoare nouă]
-   - Stare nouă adăugată: [nume stare] - [ce face]
-   - Tranziție modificată: [descrieți]
-
-3. **UI îmbunătățit:**
-   - [descrieți modificările vizuale/funcționale]
-   - Screenshot: `docs/screenshots/ui_optimized.png`
-
-4. **Pipeline end-to-end re-testat:**
-   - Test complet: input → preprocess → inference → decision → output
-   - Timp total: [X] ms (vs [Y] ms în Etapa 5)
+1. **Model înlocuit:** nu s-a realizat (modelul optimizat nu există)
+2. **State Machine actualizat:** nu s-a modificat față de Etapa 5
+3. **UI îmbunătățit:** nu s-au adus modificări în Etapa 6
+4. **Pipeline end-to-end re-testat:** nu s-a documentat în această etapă
 ```
 
 ### Diagrama State Machine Actualizată (dacă s-au făcut modificări)
@@ -183,31 +167,14 @@ Motivație: Predicțiile cu confidence <0.6 sunt trimise pentru review uman,
 
 ### 2.1 Confusion Matrix și Interpretare
 
-**Locație:** `docs/confusion_matrix_optimized.png`
+**Locație:** n/a pentru model optimizat. Există doar `docs/confusion_matrix.png` pentru modelul din Etapa 5.
 
 **Analiză obligatorie (completați):**
 
 ```markdown
-### Interpretare Confusion Matrix:
-
-**Clasa cu cea mai bună performanță:** [Nume clasă]
-- Precision: [X]%
-- Recall: [Y]%
-- Explicație: [De ce această clasă e recunoscută bine - ex: features distincte, multe exemple]
-
-**Clasa cu cea mai slabă performanță:** [Nume clasă]
-- Precision: [X]%
-- Recall: [Y]%
-- Explicație: [De ce această clasă e problematică - ex: confuzie cu altă clasă, puține exemple]
-
-**Confuzii principale:**
-1. Clasa [A] confundată cu clasa [B] în [X]% din cazuri
-   - Cauză: [descrieți - ex: features similare, overlap în spațiul de caracteristici]
-   - Impact industrial: [descrieți consecințele]
-   
-2. Clasa [C] confundată cu clasa [D] în [Y]% din cazuri
-   - Cauză: [descrieți]
-   - Impact industrial: [descrieți]
+Confusion Matrix pentru modelul optimizat nu a fost generată,
+deoarece Etapa 6 nu a fost executată în acest repository.
+Este disponibilă doar matricea pentru modelul din Etapa 5.
 ```
 
 ### 2.2 Analiza Detaliată a 5 Exemple Greșite
@@ -216,8 +183,7 @@ Selectați și analizați **minimum 5 exemple greșite** de pe test set:
 
 | **Index** | **True Label** | **Predicted** | **Confidence** | **Cauză probabilă** | **Soluție propusă** |
 |-----------|----------------|---------------|----------------|---------------------|---------------------|
-| #127 | defect_mare | defect_mic | 0.52 | Imagine subexpusă | Augmentare brightness |
-| #342 | normal | defect_mic | 0.48 | Zgomot senzor ridicat | Filtru median pre-inference |
+| n/a | n/a | n/a | n/a | Etapa 6 neexecutată | n/a |
 | #567 | defect_mic | normal | 0.61 | Defect la margine imagine | Augmentare crop variabil |
 | #891 | defect_mare | defect_mic | 0.55 | Overlap features între clase | Mai multe date clasa 'defect_mare' |
 | #1023 | normal | defect_mare | 0.71 | Reflexie metalică interpretată ca defect | Augmentare reflexii |
@@ -523,17 +489,15 @@ proiect-rn-[prenume-nume]/
 ```
 
 **Diferențe față de Etapa 5:**
-- Adăugat `etapa6_optimizare_concluzii.md` (acest fișier)
-- Adăugat `docs/confusion_matrix_optimized.png` - OBLIGATORIU
-- Adăugat `docs/results/` cu vizualizări finale
-- Adăugat `docs/optimization/` cu grafice comparative
-- Adăugat `docs/screenshots/inference_optimized.png` - OBLIGATORIU
-- Adăugat `models/optimized_model.h5` - OBLIGATORIU
-- Adăugat `results/optimization_experiments.csv` - OBLIGATORIU
-- Adăugat `results/final_metrics.json` - metrici finale
-- Adăugat `src/neural_network/optimize.py` - script optimizare
-- Actualizat `src/app/main.py` să încarce model OPTIMIZAT
-- (Opțional) `docs/state_machine_v2.png` dacă s-au făcut modificări
+- Acest README a fost adăugat pentru documentarea Etapei 6
+- Nu a fost generat `docs/confusion_matrix_optimized.png`
+- Nu au fost create `docs/results/` și `docs/optimization/`
+- Nu a fost generat `docs/screenshots/inference_optimized.png`
+- Nu a fost generat `models/optimized_model.h5`
+- Nu au fost create `results/optimization_experiments.csv` și `results/final_metrics.json`
+- Nu există `src/neural_network/optimize.py`
+- `src/app/main.py` a rămas configurat pe modelul antrenat din Etapa 5
+- `docs/state_machine_v2.png` nu a fost creat
 
 ---
 
@@ -552,33 +516,31 @@ python src/neural_network/train.py --lr 0.001 --batch 32 --dropout 0.5 --epochs 
 ### 2. Evaluare și comparare
 
 ```bash
-python src/neural_network/evaluate.py --model models/optimized_model.h5 --detailed
+python src/neural_network/evaluate.py
 
 # Output așteptat:
-# Test Accuracy: 0.8123
-# Test F1-score (macro): 0.7734
-# ✓ Confusion matrix saved to docs/confusion_matrix_optimized.png
-# ✓ Metrics saved to results/final_metrics.json
-# ✓ Top 5 errors analysis saved to results/error_analysis.json
+# Test Accuracy: 0.9907
+# Test F1-score (macro): 0.9901
+# (Opțional) Confusion matrix salvată în docs/confusion_matrix.png dacă matplotlib este disponibil
 ```
 
 ### 3. Actualizare UI cu model optimizat
 
 ```bash
 # Verificare că UI încarcă modelul corect
-streamlit run src/app/main.py
+python src/app/main.py
 
 # În consolă trebuie să vedeți:
-# Loading model: models/optimized_model.h5
-# Model loaded successfully. Accuracy on validation: 0.8123
+# Loading model: models/trained_model.h5
+# Model loaded successfully.
 ```
 
 ### 4. Generare vizualizări finale
 
 ```bash
-python src/neural_network/visualize.py --all
+N/A – scriptul `src/neural_network/visualize.py` nu există în acest repo.
 
-# Generează:
+# Generează (când există script):
 # - docs/results/metrics_evolution.png
 # - docs/results/learning_curves_final.png
 # - docs/optimization/accuracy_comparison.png
@@ -596,25 +558,25 @@ python src/neural_network/visualize.py --all
 - [x] State Machine implementat
 
 ### Optimizare și Experimentare
-- [x] Minimum 4 experimente documentate în tabel
-- [x] Justificare alegere configurație finală
-- [x] Model optimizat salvat în `models/optimized_model.h5`
-- [x] Metrici finale: **Accuracy ≥70%**, **F1 ≥0.65**
-- [x] `results/optimization_experiments.csv` cu toate experimentele
-- [x] `results/final_metrics.json` cu metrici model optimizat
+- [ ] Minimum 4 experimente documentate în tabel
+- [ ] Justificare alegere configurație finală
+- [ ] Model optimizat salvat în `models/optimized_model.h5`
+- [ ] Metrici finale: **Accuracy ≥70%**, **F1 ≥0.65**
+- [ ] `results/optimization_experiments.csv` cu toate experimentele
+- [ ] `results/final_metrics.json` cu metrici model optimizat
 
 ### Analiză Performanță
-- [x] Confusion matrix generată în `docs/confusion_matrix_optimized.png`
-- [x] Analiză interpretare confusion matrix completată în README
-- [x] Minimum 5 exemple greșite analizate detaliat
-- [x] Implicații industriale documentate (cost FN vs FP)
+- [ ] Confusion matrix generată în `docs/confusion_matrix_optimized.png`
+- [ ] Analiză interpretare confusion matrix completată în README
+- [ ] Minimum 5 exemple greșite analizate detaliat
+- [ ] Implicații industriale documentate (cost FN vs FP)
 
 ### Actualizare Aplicație Software
-- [x] Tabel modificări aplicație completat
-- [x] UI încarcă modelul OPTIMIZAT (nu cel din Etapa 5)
-- [x] Screenshot `docs/screenshots/inference_optimized.png`
-- [x] Pipeline end-to-end re-testat și funcțional
-- [x] (Dacă aplicabil) State Machine actualizat și documentat
+- [ ] Tabel modificări aplicație completat
+- [ ] UI încarcă modelul OPTIMIZAT (nu cel din Etapa 5)
+- [ ] Screenshot `docs/screenshots/inference_optimized.png`
+- [ ] Pipeline end-to-end re-testat și funcțional
+- [ ] (Dacă aplicabil) State Machine actualizat și documentat
 
 ### Concluzii
 - [x] Secțiune evaluare performanță finală completată

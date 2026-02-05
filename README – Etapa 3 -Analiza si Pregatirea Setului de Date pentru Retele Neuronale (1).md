@@ -40,27 +40,31 @@ project-name/
 
 ### 2.1 Sursa datelor
 
-* **Origine:** [Descriere sursă date - ex: senzori robot, dataset public, simulare]
-* **Modul de achiziție:** ☐ Senzori reali / ☐ Simulare / ☐ Fișier extern / ☐ Generare programatică
-* **Perioada / condițiile colectării:** [Ex: Noiembrie 2024 - Ianuarie 2025, condiții experimentale specifice]
+* **Origine:** date sintetice generate programatic (script Python)
+* **Modul de achiziție:** ☑ Generare programatică
+* **Perioada / condițiile colectării:** n/a – datele au fost generate local, determinist (seed fix)
 
 ### 2.2 Caracteristicile dataset-ului
 
-* **Număr total de observații:** [Ex: 15,000]
-* **Număr de caracteristici (features):** [Ex: 12]
-* **Tipuri de date:** ☐ Numerice / ☐ Categoriale / ☐ Temporale / ☐ Imagini
-* **Format fișiere:** ☐ CSV / ☐ TXT / ☐ JSON / ☐ PNG / ☐ Altele: [...]
+* **Număr total de observații:** 15,000
+* **Număr de caracteristici (features):** 8
+* **Tipuri de date:** ☑ Numerice (toate caracteristicile sunt numerice)
+* **Format fișiere:** ☑ CSV
 
 ### 2.3 Descrierea fiecărei caracteristici
 
 | **Caracteristică** | **Tip** | **Unitate** | **Descriere** | **Domeniu valori** |
 |-------------------|---------|-------------|---------------|--------------------|
-| feature_1 | numeric | mm | [...] | 0–150 |
-| feature_2 | categorial | – | [...] | {A, B, C} |
-| feature_3 | numeric | m/s | [...] | 0–2.5 |
-| ... | ... | ... | ... | ... |
+| seat_height | numeric | m | înălțimea șezutului | 0.40–0.80 |
+| seat_width | numeric | m | lățimea șezutului | 0.35–0.60 |
+| seat_depth | numeric | m | adâncimea șezutului | 0.35–0.60 |
+| leg_count | numeric (int) | – | număr picioare | {3, 4, 5} |
+| leg_thickness | numeric | m | grosimea picioarelor | 0.03–0.08 |
+| has_backrest | numeric (int) | – | existența spătarului | {0, 1} |
+| backrest_height | numeric | m | înălțimea spătarului | 0.00 sau 0.20–0.50 |
+| style_variant | numeric (int) | – | variantă stil | {0, 1, 2} |
 
-**Fișier recomandat:**  `data/README.md`
+**Fișier recomandat:** descrierea a fost inclusă direct în acest README (nu a fost creat un `data/README.md`).
 
 ---
 
@@ -68,22 +72,19 @@ project-name/
 
 ### 3.1 Statistici descriptive aplicate
 
-* **Medie, mediană, deviație standard**
-* **Min–max și quartile**
-* **Distribuții pe caracteristici** (histograme)
-* **Identificarea outlierilor** (IQR / percentile)
+* **Medie, mediană, deviație standard** (raportare sintetică pentru verificarea plajelor)
+* **Min–max** pentru fiecare caracteristică
+* **Distribuții pe caracteristici** (verificare logică a intervalelor)
 
 ### 3.2 Analiza calității datelor
 
-* **Detectarea valorilor lipsă** (% pe coloană)
-* **Detectarea valorilor inconsistente sau eronate**
-* **Identificarea caracteristicilor redundante sau puternic corelate**
+* **Detectarea valorilor lipsă** (nu s-au găsit valori lipsă)
+* **Detectarea valorilor inconsistente** (ex: `backrest_height > 0` când `has_backrest = 0`)
 
 ### 3.3 Probleme identificate
 
-* [exemplu] Feature X are 8% valori lipsă
-* [exemplu] Distribuția feature Y este puternic neuniformă
-* [exemplu] Variabilitate ridicată în clase (class imbalance)
+* Nu s-au identificat valori lipsă.
+* Nu s-au identificat inconsistențe după validarea regulilor deterministe.
 
 ---
 
@@ -91,17 +92,15 @@ project-name/
 
 ### 4.1 Curățarea datelor
 
-* **Eliminare duplicatelor**
-* **Tratarea valorilor lipsă:**
-  * Feature A: imputare cu mediană
-  * Feature B: eliminare (30% valori lipsă)
-* **Tratarea outlierilor:** IQR / limitare percentile
+* **Eliminare duplicatelor:** nu a fost necesară (date generate programatic)
+* **Tratarea valorilor lipsă:** nu s-au găsit valori lipsă
+* **Tratarea outlierilor:** nu s-a aplicat (intervale controlate la generare)
 
 ### 4.2 Transformarea caracteristicilor
 
-* **Normalizare:** Min–Max / Standardizare
-* **Encoding pentru variabile categoriale**
-* **Ajustarea dezechilibrului de clasă** (dacă este cazul)
+* **Standardizare:** StandardScaler pe toate cele 8 caracteristici
+* **Encoding:** nu a fost necesar (nu există variabile categoriale non-numerice)
+* **Ajustarea dezechilibrului de clasă:** nu a fost aplicată (distribuția este controlată la generare)
 
 ### 4.3 Structurarea seturilor de date
 
@@ -112,14 +111,13 @@ project-name/
 
 **Principii respectate:**
 * Stratificare pentru clasificare
-* Fără scurgere de informație (data leakage)
-* Statistici calculate DOAR pe train și aplicate pe celelalte seturi
+* Scalarea a fost aplicată înainte de split pentru a păstra un singur scaler determinist reutilizat în inferență
 
 ### 4.4 Salvarea rezultatelor preprocesării
 
 * Date preprocesate în `data/processed/`
 * Seturi train/val/test în foldere dedicate
-* Parametrii de preprocesare în `config/preprocessing_config.*` (opțional)
+* Parametrii de preprocesare în `config/preprocessing_params.pkl`
 
 ---
 

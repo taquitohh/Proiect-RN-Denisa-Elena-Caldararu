@@ -190,8 +190,8 @@ Completați in acest readme tabelul următor cu **minimum 2-3 rânduri** care le
 | Ex: Detectarea automată a fisurilor în suduri robotizate | Clasificare imagine radiografică → alertă operator în < 2 secunde | RN + Web Service |
 | Ex: Predicția uzurii lagărelor în turbine eoliene | Analiză vibrații în timp real → alertă preventivă cu 95% acuratețe | Data Logging + RN + UI |
 | Ex: Optimizarea traiectoriilor robotului mobil în depozit | Predicție timp traversare → reducere 20% consum energetic | RN + Control Module |
-| [Completați cu proiectul vostru] | | |
-| [Completați cu proiectul vostru] | | |
+| Reducerea timpului de creare a obiectelor 3D parametrice | Clasifică tipul de scaun și generează script Blender corespunzător în câteva secunde | RN + Generator Blender |
+| Eliminarea erorilor de input la generarea scaunului | Validează parametrii (intervale și reguli spătar) înainte de inferență | UI Web (Flask) + Preprocess |
 
 **Instrucțiuni:**
 - Fiți concreti (nu vagi): "detectare fisuri sudură" ✓, "îmbunătățire proces" ✗
@@ -247,26 +247,29 @@ Scrieți clar în acest README (Secțiunea 2):
 ```markdown
 ### Contribuția originală la setul de date:
 
-**Total observații finale:** [N] (după Etapa 3 + Etapa 4)
-**Observații originale:** [M] ([X]%)
+**Total observații finale:** 15,000
+**Observații originale:** 15,000 (100%)
 
 **Tipul contribuției:**
-[X] Date generate prin simulare fizică  
+[ ] Date generate prin simulare fizică  
 [ ] Date achiziționate cu senzori proprii  
 [ ] Etichetare/adnotare manuală  
-[ ] Date sintetice prin metode avansate  
+[X] Date sintetice generate programatic  
 
 **Descriere detaliată:**
-[Explicați în 2-3 paragrafe cum ați generat datele, ce metode ați folosit, 
-de ce sunt relevante pentru problema voastră, cu ce parametri ați rulat simularea/achiziția]
+Datele au fost generate programatic printr-un script Python care produce
+15,000 observații sintetice folosind intervale controlate pentru 8
+parametri geometrici ai scaunului. Etichetarea claselor a fost deterministă,
+bazată pe reguli logice (de exemplu, înălțimea șezutului și existența spătarului).
+Acest mecanism a asigurat consistență, reproductibilitate (seed fix) și o
+distribuție coerentă a claselor pentru o problemă de clasificare multi-clasă.
 
-**Locația codului:** `src/data_acquisition/[numele_scriptului]`
-**Locația datelor:** `data/generated/` sau `data/raw/original/`
+**Locația codului:** `src/data_acquisition/generate_chairs.py`
+**Locația datelor:** `data/generated/chairs_dataset.csv`
 
 **Dovezi:**
-- Grafic comparativ: `docs/generated_vs_real.png`
-- Setup experimental: `docs/acquisition_setup.jpg` (dacă aplicabil)
-- Tabel statistici: `docs/data_statistics.csv`
+- Distribuție clase afișată în rularea scriptului (log în consolă)
+- Fișier CSV generat în `data/generated/`
 ```
 
 #### Exemple pentru "contribuție originală":
@@ -359,26 +362,27 @@ Chiar dacă aplicația voastră este o clasificare simplă (user upload → clas
 ```markdown
 ### Justificarea State Machine-ului ales:
 
-Am ales arhitectura [descrieți tipul: monitorizare continuă / clasificare la senzor / 
-predicție batch / control în timp real] pentru că proiectul nostru [explicați nevoia concretă 
-din tabelul Secțiunea 1].
+A fost aleasă o arhitectură de tip clasificare la cerere (user-triggered),
+deoarece utilizatorul introduce parametri geometrici și solicită generarea
+unui script Blender pentru un scaun. Fluxul a fost modelat ca State Machine
+pentru a delimita clar validarea inputului, preprocesarea, inferența RN și
+generarea scriptului determinist.
 
-Stările principale sunt:
-1. [STARE_1]: [ce se întâmplă aici - ex: "achiziție 1000 samples/sec de la accelerometru"]
-2. [STARE_2]: [ce se întâmplă aici - ex: "calcul FFT și extragere 50 features frecvență"]
-3. [STARE_3]: [ce se întâmplă aici - ex: "inferență RN cu latență < 50ms"]
-...
+Stările principale au fost:
+1. **IDLE**: aplicația așteaptă inputul utilizatorului în UI.
+2. **USER_INPUT**: parametrii au fost colectați și validați (intervale, reguli spătar).
+3. **PREPROCESS**: scalerul salvat a fost aplicat pe datele de intrare.
+4. **RN_INFERENCE**: modelul RN a prezis clasa scaunului.
+5. **SCRIPT_GENERATION**: scriptul Blender a fost generat determinist.
+6. **DISPLAY**: rezultatele au fost afișate utilizatorului.
 
-Tranzițiile critice sunt:
-- [STARE_A] → [STARE_B]: [când se întâmplă - ex: "când buffer-ul atinge 1024 samples"]
-- [STARE_X] → [ERROR]: [condiții - ex: "când senzorul nu răspunde > 100ms"]
+Tranzițiile critice au fost:
+- **USER_INPUT → IDLE**: parametri invalizi (ex: backrest_height > 0 când has_backrest = 0).
+- **PREPROCESS → IDLE**: eroare la încărcarea scalerului.
+- **RN_INFERENCE → IDLE**: model indisponibil sau eroare la inferență.
 
-Starea ERROR este esențială pentru că [explicați ce erori pot apărea în contextul 
-aplicației voastre industriale - ex: "senzorul se poate deconecta în mediul industrial 
-cu vibrații și temperatură variabilă, trebuie să gestionăm reconnect automat"].
-
-Bucla de feedback [dacă există] funcționează astfel: [ex: "rezultatul inferenței 
-actualizează parametrii controlerului PID pentru reglarea vitezei motorului"].
+Starea de eroare a fost tratată prin revenire la IDLE și afișarea unui mesaj,
+pentru a permite reluarea corectă a cererii fără blocarea aplicației.
 ```
 
 ---
@@ -391,7 +395,7 @@ Toate cele 3 module trebuie să **pornească și să ruleze fără erori** la pr
 |-----------|----------------------------------|-------------|----------------------------------------------|
 | **1. Data Logging / Acquisition** | `src/data_acquisition/` | LLB cu VI-uri de generare/achiziție | **MUST:** Produce CSV cu datele voastre (inclusiv cele 40% originale). Cod rulează fără erori și generează minimum 100 samples demonstrative. |
 | **2. Neural Network Module** | `src/neural_network/model.py` sau folder dedicat | LLB cu VI-uri RN | **MUST:** Modelul RN definit, compilat, poate fi încărcat. **NOT required:** Model antrenat cu performanță bună (poate avea weights random/inițializați). |
-| **3. Web Service / UI** | Streamlit, Gradio, FastAPI, Flask, Dash | WebVI sau Web Publishing Tool | **MUST:** Primește input de la user și afișează un output. **NOT required:** UI frumos, funcționalități avansate. |
+| **3. Web Service / UI** | Flask | WebVI sau Web Publishing Tool | **MUST:** Primește input de la user și afișează un output. **NOT required:** UI frumos, funcționalități avansate. |
 
 #### Detalii per modul:
 
@@ -463,7 +467,7 @@ utilizator și Sistemul cu Inteligență Artificială. Acesta permite introducer
 manuală a parametrilor geometrici ai obiectului de mobilier și afișează
 rezultatul clasificării realizate de rețeaua neuronală.
 
-Interfața este implementată sub forma unei aplicații web folosind Streamlit,
+Interfața este implementată sub forma unei aplicații web folosind Flask,
 asigurând un flux end-to-end complet:
 input utilizator → preprocesare → inferență RN → afișare rezultat.
 
