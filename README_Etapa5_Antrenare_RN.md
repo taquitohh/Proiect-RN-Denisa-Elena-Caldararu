@@ -2,7 +2,7 @@
 
 **Disciplina:** Rețele Neuronale  
 **Instituție:** POLITEHNICA București – FIIR  
-**Student:** Caldararu Denisa  
+**Student:** Caldararu Denisa Elena  
 **Link Repository GitHub:** https://github.com/taquitohh/Proiect_RN  
 **Data predării:** 10.01.2026
 
@@ -116,20 +116,20 @@ Completați tabelul cu hiperparametrii folosiți și **justificați fiecare aleg
 
 | **Hiperparametru** | **Valoare Aleasă** | **Justificare** |
 |--------------------|-------------------|-----------------|
-| Learning rate | Ex: 0.001 | Valoare standard pentru Adam optimizer, asigură convergență stabilă |
-| Batch size | Ex: 32 | Compromis memorie/stabilitate pentru N=[numărul vostru] samples |
-| Number of epochs | Ex: 50 | Cu early stopping după 10 epoci fără îmbunătățire |
-| Optimizer | Ex: Adam | Adaptive learning rate, potrivit pentru RN cu [numărul vostru] straturi |
-| Loss function | Ex: Categorical Crossentropy | Clasificare multi-class cu K=[numărul vostru] clase |
-| Activation functions | Ex: ReLU (hidden), Softmax (output) | ReLU pentru non-linearitate, Softmax pentru probabilități clase |
+| Learning rate | 0.001 | Valoare standard pentru Adam, asigură convergență stabilă pe date tabulare |
+| Batch size | 32 | Compromis memorie/stabilitate pentru N=15,000 samples |
+| Number of epochs | 10 | Minimum cerut (Nivel 1) si suficient pentru baseline pe date sintetice |
+| Optimizer | Adam | Optimizator adaptiv potrivit pentru MLP cu 2 straturi ascunse |
+| Loss function | Sparse Categorical Crossentropy | Clasificare multi-clasa cu etichete intregi (4 clase pentru chair) |
+| Activation functions | ReLU (hidden), Softmax (output) | ReLU pentru non-linearitate, Softmax pentru probabilitati |
 
-**Justificare detaliată batch size (exemplu):**
+**Justificare detaliată batch size:**
 ```
 Am ales batch_size=32 pentru că avem N=15,000 samples → 15,000/32 ≈ 469 iterații/epocă.
 Aceasta oferă un echilibru între:
 - Stabilitate gradient (batch prea mic → zgomot mare în gradient)
-- Memorie GPU (batch prea mare → out of memory)
-- Timp antrenare (batch 32 asigură convergență în ~50 epoci pentru problema noastră)
+- Memorie (batch prea mare → consum ridicat)
+- Timp antrenare (batch 32 permite rulare rapida la 10 epoci)
 ```
 
 **Resurse învățare rapidă:**
@@ -218,64 +218,57 @@ prediction = model.predict(input_scaled)  # predicție REALĂ și corectă
 
 ### 1. Pe ce clase greșește cel mai mult modelul?
 
-**Exemplu robotică (predicție traiectorii):**
-```
-Confusion Matrix arată că modelul confundă 'viraj stânga' cu 'viraj dreapta' în 18% din cazuri.
-Cauză posibilă: Features-urile IMU (gyro_z) sunt simetrice pentru viraje în direcții opuse.
-```
 
-**Completați pentru proiectul vostru:**
-```
-Analiza erorilor detaliate nu a fost realizată în Etapa 5.
-Au fost raportate metricile globale (Accuracy și F1 macro) pe test set.
-```
+
+Modelul are erori reduse (Accuracy ≈ 0.99), iar confuziile apar mai ales intre clasele
+cu geometrie apropiata. Conform matricei de confuzie:
+- Simple Chair → Chair with Backrest: 6 cazuri (din 544)
+- Bar Chair → Chair with Backrest: 5 cazuri (din 843)
+- Bar Chair → Simple Chair: 4 cazuri (din 843)
+- Stool → Simple Chair: 3 cazuri (din 284)
+- Chair with Backrest → Simple Chair: 3 cazuri (din 579)
+
+Nota: valorile sunt extrase din matricea de confuzie (rand = clasa reala, coloana = clasa prezisa).
+De exemplu, „Simple Chair → Chair with Backrest: 6 (din 544)” inseamna 6 predictii gresite
+din totalul de 544 exemple Simple Chair din test.
+
+Acuratete pe clase (test):
+- Simple Chair: ~98.53%
+- Chair with Backrest: ~99.14%
+- Bar Chair: ~98.93%
+- Stool: ~98.94%
 
 ### 2. Ce caracteristici ale datelor cauzează erori?
 
-**Exemplu vibrații motor:**
-```
-Modelul eșuează când zgomotul de fond depășește 40% din amplitudinea semnalului util.
-În mediul industrial, acest nivel de zgomot apare când mai multe motoare funcționează simultan.
-```
 
-**Completați pentru proiectul vostru:**
-```
-Nu au fost documentate condiții specifice de eroare în această etapă.
-```
+
+Erorile apar in zona de prag intre scaune fara spatar si cele cu spatar, precum si
+intre scaune joase (stool) si scaune simple cu dimensiuni similare. In special:
+- valori de backrest_height foarte mici pot duce la confuzie cu Simple Chair;
+- style_variant nu separa complet clasele cand dimensiunile sunt apropiate;
+- scaunele inalte (bar chair) pot fi confundate cu chair with backrest cand
+   proportiile se suprapun partial.
 
 ### 3. Ce implicații are pentru aplicația industrială?
 
-**Exemplu detectare defecte sudură:**
-```
-FALSE NEGATIVES (defect nedetectat): CRITIC → risc rupere sudură în exploatare
-FALSE POSITIVES (alarmă falsă): ACCEPTABIL → piesa este re-inspectată manual
 
-Prioritate: Minimizare false negatives chiar dacă cresc false positives.
-Soluție: Ajustare threshold clasificare de la 0.5 → 0.3 pentru clasa 'defect'.
-```
 
-**Completați pentru proiectul vostru:**
-```
-Impactul erorilor a fost notat ca risc de clasificare greșită a tipului de scaun,
-fără consecințe industriale critice. Prioritatea a fost obținerea unei acurateți
-ridicate pentru demonstrarea corectitudinii pipeline-ului end-to-end.
-```
+Impactul erorilor este minor in contextul proiectului: o clasa prezisa gresit
+produce un script Blender pentru o varianta apropiata, fara riscuri critice.
+Totusi, pentru utilizare in productie, confuzia dintre variante (ex: backrest vs
+no backrest) poate afecta fidelitatea modelului 3D si ar necesita validare suplimentara.
+Prioritatea ramane obtinerea unei acurateti ridicate pentru a demonstra corectitudinea
+pipeline-ului end-to-end.
 
 ### 4. Ce măsuri corective propuneți?
 
-**Exemplu clasificare imagini piese:**
-```
-Măsuri corective:
-1. Colectare 500+ imagini adiționale pentru clasa minoritară 'zgârietură ușoară'
-2. Implementare filtrare Gaussian blur pentru reducere zgomot cameră industrială
-3. Augmentare perspective pentru simulare unghiuri camera variabile (±15°)
-4. Re-antrenare cu class weights: [1.0, 2.5, 1.2] pentru echilibrare
-```
 
-**Completați pentru proiectul vostru:**
-```
-[Propuneți minimum 3 măsuri concrete pentru îmbunătățire]
-```
+
+Măsuri corective propuse:
+1. Esantionare suplimentara in zonele de prag (ex: backrest_height aproape de 0.0).
+2. Reguli post-procesare simple (daca has_backrest = 0, excludem clasa backrest).
+3. Feature engineering: raporturi precum backrest_height / seat_height.
+4. Re-antrenare cu weighting pe clasele cu confuzii mai frecvente.
 
 ---
 
@@ -337,12 +330,6 @@ Proiect_RN/
 └── .gitignore
 ```
 
-Fisiere recomandate pentru predare (de adaugat inainte de prezentare):
-
-- `docs/loss_curve.png`
-- `docs/screenshots/inference_real.png`
-- `docs/screenshots/ui_demo.png`
-- `results/hyperparameters.yaml`
 
 **Diferențe față de Etapa 4:**
 - Adăugat `docs/etapa5_antrenare_model.md` (acest fișier)
@@ -437,7 +424,7 @@ python src/app/main.py
 ### Integrare UI și Demonstrație - Nivel 1 (OBLIGATORIU)
 - [x] Model ANTRENAT încărcat în UI din Etapa 4 (nu model dummy)
 - [x] UI face inferență REALĂ cu predicții corecte
-- [ ] Screenshot inferență reală în `docs/screenshots/inference_real.png`
+- [x] Screenshot inferență reală în `docs/screenshots/inference_real.png`
 - [x] Verificat: predicțiile sunt diferite față de Etapa 4 (când erau random)
 
 ### Documentație Nivel 2 (dacă aplicabil)

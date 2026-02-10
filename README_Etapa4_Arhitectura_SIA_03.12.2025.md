@@ -258,7 +258,7 @@ Toate cele 3 module trebuie să **pornească și să ruleze fără erori** la pr
 
 ### Modul 2: Neural Network
 - [x] Arhitectură RN definită și documentată în cod (docstring detaliat) - versiunea inițială
-- [ ] README în `src/neural_network/` cu detalii arhitectură curentă
+- [x] README în `src/neural_network/` cu detalii arhitectură curentă
 
 ### Modul 3: Web Service / UI
 - [x] Propunere Interfață ce pornește fără erori (comanda de lansare testată)
