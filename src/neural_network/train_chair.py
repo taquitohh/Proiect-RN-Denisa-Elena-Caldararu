@@ -1,6 +1,7 @@
 """Training pipeline for the neural network model (Etapa 5.2).
 
-This script performs baseline training without advanced optimizations.
+This script performs training with basic regularization features (early stopping,
+learning rate scheduling) and light tabular augmentation.
 It loads the final preprocessed datasets, builds the MLP model defined in
 src/neural_network/model.py, compiles it, trains it, and saves both the trained
 model and training history.
@@ -16,6 +17,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+import numpy as np
 import pandas as pd
 import tensorflow as tf
 
@@ -36,9 +38,33 @@ def load_datasets() -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series]:
     return x_train, y_train, x_val, y_val
 
 
+def augment_tabular(x_train: pd.DataFrame, y_train: pd.Series) -> Tuple[pd.DataFrame, pd.Series]:
+    """Apply light Gaussian noise to continuous features only."""
+    continuous_cols = [
+        "seat_height",
+        "seat_width",
+        "seat_depth",
+        "leg_thickness",
+        "backrest_height",
+    ]
+
+    x_aug = x_train.copy()
+    std = x_train[continuous_cols].std().fillna(0.0)
+    noise = np.random.normal(loc=0.0, scale=0.02 * std.values, size=x_aug[continuous_cols].shape)
+    x_aug[continuous_cols] = x_aug[continuous_cols] + noise
+
+    if "has_backrest" in x_aug.columns:
+        x_aug.loc[x_aug["has_backrest"] == 0, "backrest_height"] = 0.0
+
+    x_out = pd.concat([x_train, x_aug], ignore_index=True)
+    y_out = pd.concat([y_train, y_train], ignore_index=True)
+    return x_out, y_out
+
+
 def train(epochs: int = 10, batch_size: int = 32) -> None:
     """Train the model with baseline hyperparameters and save outputs."""
     x_train, y_train, x_val, y_val = load_datasets()
+    x_train, y_train = augment_tabular(x_train, y_train)
 
     input_dim = x_train.shape[1]
     num_classes = int(pd.Series(y_train).nunique())
@@ -51,6 +77,20 @@ def train(epochs: int = 10, batch_size: int = 32) -> None:
         metrics=["accuracy"],
     )
 
+    callbacks = [
+        tf.keras.callbacks.EarlyStopping(
+            monitor="val_loss",
+            patience=5,
+            restore_best_weights=True,
+        ),
+        tf.keras.callbacks.ReduceLROnPlateau(
+            monitor="val_loss",
+            factor=0.5,
+            patience=3,
+            min_lr=1e-5,
+        ),
+    ]
+
     history = model.fit(
         x_train,
         y_train,
@@ -58,6 +98,7 @@ def train(epochs: int = 10, batch_size: int = 32) -> None:
         epochs=epochs,
         batch_size=batch_size,
         verbose=1,
+        callbacks=callbacks,
     )
 
     MODELS_DIR.mkdir(parents=True, exist_ok=True)

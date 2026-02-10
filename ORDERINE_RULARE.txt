@@ -55,6 +55,13 @@ PAS 6: Evaluare (optional, dar recomandat)
   - results/chair_test_metrics.json
 - De ce e necesar: confirma performanta modelului si verifica ca tot fluxul functioneaza.
 
+PAS 7: Export ONNX + benchmark (optional, pentru Nivel 3)
+- Script: src/neural_network/export_onnx.py
+- Ce face: exporta modelul in ONNX si masoara latenta (CPU, batch=1).
+- Output:
+  - models/chair_model.onnx
+- De ce e necesar: demonstratie compatibilitate ONNX + latenta sub 50ms.
+
 -------------------------------------------------
 2) ORDINEA CAND APESEZI "PREDICT" IN SITE
 -------------------------------------------------
@@ -102,6 +109,7 @@ REZUMAT (fisiere cheie)
 - Arhitectura RN: src/neural_network/model.py
 - Antrenare chair: src/neural_network/train_chair.py
 - Evaluare chair: src/neural_network/evaluate.py
+- Export ONNX: src/neural_network/export_onnx.py
 - UI: src/app/main.py
 - Blender generator: src/blender_scripts/chair_generator.py
 - Blender API: src/blender_api/server.py

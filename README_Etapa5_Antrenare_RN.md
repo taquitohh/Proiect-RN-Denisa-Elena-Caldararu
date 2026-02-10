@@ -63,13 +63,13 @@ optimizările ulterioare din Etapa 6.
 Exemplu:
 ```bash
 # 1. Curățare date
-python src/preprocessing/data_cleaner.py
+python src/preprocessing/chair_data_cleaner.py
 
 # 2. Scalare StandardScaler
-python src/preprocessing/feature_scaler.py
+python src/preprocessing/chair_feature_scaler.py
 
 # 3. Împărțire stratificată
-python src/preprocessing/data_splitter.py
+python src/preprocessing/chair_data_splitter.py
 
 # Verificare finală:
 # data/chairs/train/ → trebuie să conțină date vechi + noi
@@ -116,12 +116,12 @@ Completați tabelul cu hiperparametrii folosiți și **justificați fiecare aleg
 
 | **Hiperparametru** | **Valoare Aleasă** | **Justificare** |
 |--------------------|-------------------|-----------------|
-| Learning rate | 0.001 | Valoare standard pentru Adam, asigură convergență stabilă pe date tabulare |
-| Batch size | 32 | Compromis memorie/stabilitate pentru N=15,000 samples |
-| Number of epochs | 10 | Minimum cerut (Nivel 1) si suficient pentru baseline pe date sintetice |
-| Optimizer | Adam | Optimizator adaptiv potrivit pentru MLP cu 2 straturi ascunse |
-| Loss function | Sparse Categorical Crossentropy | Clasificare multi-clasa cu etichete intregi (4 clase pentru chair) |
-| Activation functions | ReLU (hidden), Softmax (output) | ReLU pentru non-linearitate, Softmax pentru probabilitati |
+| Learning rate | 0.001 | Valoare standard pentru Adam optimizer, asigură convergență stabilă |
+| Batch size | 32 | Compromis memorie/stabilitate pentru setul de date tabular |
+| Number of epochs | 50 | Early stopping (patience=5) oprește când `val_loss` nu scade |
+| Optimizer | Adam | Adaptive learning rate, stabil pentru MLP cu 2 straturi ascunse |
+| Loss function | Sparse Categorical Crossentropy | Clasificare multi-class cu 4 clase pentru chair |
+| Activation functions | ReLU (hidden), Softmax (output) | ReLU pentru non-linearitate, Softmax pentru probabilități clase |
 
 **Justificare detaliată batch size:**
 ```
@@ -154,6 +154,11 @@ Includeți **TOATE** cerințele Nivel 1 + următoarele:
 4. **Grafic loss și val_loss** în funcție de epoci salvat în `docs/loss_curve.png`
 5. **Analiză erori context industrial** (vezi secțiunea dedicată mai jos - OBLIGATORIU Nivel 2)
 
+Implementare in proiect:
+- Early stopping pe `val_loss` cu `patience=5` si `restore_best_weights=True`.
+- Scheduler `ReduceLROnPlateau` (factor 0.5, `patience=3`).
+- Augmentare tabulara usoara: zgomot gaussian pe feature-uri continue (2% din std).
+
 **Indicatori țintă Nivel 2:**
 - **Acuratețe ≥ 75%**
 - **F1-score (macro) ≥ 0.70**
@@ -172,7 +177,7 @@ Includeți **TOATE** cerințele Nivel 1 + următoarele:
 | **Activitate** |  **Livrabil** |
 |----------------|--------------|
 | Comparare 2+ arhitecturi diferite | Tabel comparativ + justificare alegere finală în README |
-| Export ONNX/TFLite + benchmark latență | Fișier `models/final_model.onnx` + demonstrație <50ms |
+| Export ONNX/TFLite + benchmark latență | Fișier `models/chair_model.onnx` + demonstrație <50ms |
 | Confusion Matrix + analiză 5 exemple greșite | `docs/confusion_matrix.png` + analiză în README |
 
 **Resurse bonus:**
@@ -218,57 +223,69 @@ prediction = model.predict(input_scaled)  # predicție REALĂ și corectă
 
 ### 1. Pe ce clase greșește cel mai mult modelul?
 
+**Exemplu robotică (predicție traiectorii):**
+```
+Confusion Matrix arată că modelul confundă 'viraj stânga' cu 'viraj dreapta' în 18% din cazuri.
+Cauză posibilă: Features-urile IMU (gyro_z) sunt simetrice pentru viraje în direcții opuse.
+```
 
-
-Modelul are erori reduse (Accuracy ≈ 0.99), iar confuziile apar mai ales intre clasele
-cu geometrie apropiata. Conform matricei de confuzie:
-- Simple Chair → Chair with Backrest: 6 cazuri (din 544)
-- Bar Chair → Chair with Backrest: 5 cazuri (din 843)
-- Bar Chair → Simple Chair: 4 cazuri (din 843)
-- Stool → Simple Chair: 3 cazuri (din 284)
-- Chair with Backrest → Simple Chair: 3 cazuri (din 579)
-
-Nota: valorile sunt extrase din matricea de confuzie (rand = clasa reala, coloana = clasa prezisa).
-De exemplu, „Simple Chair → Chair with Backrest: 6 (din 544)” inseamna 6 predictii gresite
-din totalul de 544 exemple Simple Chair din test.
-
-Acuratete pe clase (test):
-- Simple Chair: ~98.53%
-- Chair with Backrest: ~99.14%
-- Bar Chair: ~98.93%
-- Stool: ~98.94%
+**Completați pentru proiectul vostru:**
+```
+Confusion Matrix indică cele mai multe confuzii între Bar Chair și Simple Chair.
+Un al doilea tip de confuzie este între Chair with Backrest și Bar Chair.
+În exemplele greșite, înălțimea șezutului este ridicată, dar backrest_height rămâne modest,
+ceea ce face Bar Chair să fie perceput ca Simple Chair în unele cazuri.
+```
 
 ### 2. Ce caracteristici ale datelor cauzează erori?
 
+**Exemplu vibrații motor:**
+```
+Modelul eșuează când zgomotul de fond depășește 40% din amplitudinea semnalului util.
+În mediul industrial, acest nivel de zgomot apare când mai multe motoare funcționează simultan.
+```
 
-
-Erorile apar in zona de prag intre scaune fara spatar si cele cu spatar, precum si
-intre scaune joase (stool) si scaune simple cu dimensiuni similare. In special:
-- valori de backrest_height foarte mici pot duce la confuzie cu Simple Chair;
-- style_variant nu separa complet clasele cand dimensiunile sunt apropiate;
-- scaunele inalte (bar chair) pot fi confundate cu chair with backrest cand
-   proportiile se suprapun partial.
+**Completați pentru proiectul vostru:**
+```
+Erorile apar când seat_height este mare, dar backrest_height este mic (backrest scurt),
+respectiv când leg_count este atipic (3 sau 5), ceea ce reduce separabilitatea între clase.
+```
 
 ### 3. Ce implicații are pentru aplicația industrială?
 
+**Exemplu detectare defecte sudură:**
+```
+FALSE NEGATIVES (defect nedetectat): CRITIC → risc rupere sudură în exploatare
+FALSE POSITIVES (alarmă falsă): ACCEPTABIL → piesa este re-inspectată manual
 
+Prioritate: Minimizare false negatives chiar dacă cresc false positives.
+Soluție: Ajustare threshold clasificare de la 0.5 → 0.3 pentru clasa 'defect'.
+```
 
-Impactul erorilor este minor in contextul proiectului: o clasa prezisa gresit
-produce un script Blender pentru o varianta apropiata, fara riscuri critice.
-Totusi, pentru utilizare in productie, confuzia dintre variante (ex: backrest vs
-no backrest) poate afecta fidelitatea modelului 3D si ar necesita validare suplimentara.
-Prioritatea ramane obtinerea unei acurateti ridicate pentru a demonstra corectitudinea
-pipeline-ului end-to-end.
+**Completați pentru proiectul vostru:**
+```
+Impactul este limitat la selecția greșită a tipului de scaun în UI, fără consecințe critice.
+În aplicație, prioritatea rămâne demonstrarea corectitudinii pipeline-ului end-to-end.
+```
 
 ### 4. Ce măsuri corective propuneți?
 
+**Exemplu clasificare imagini piese:**
+```
+Măsuri corective:
+1. Colectare 500+ imagini adiționale pentru clasa minoritară 'zgârietură ușoară'
+2. Implementare filtrare Gaussian blur pentru reducere zgomot cameră industrială
+3. Augmentare perspective pentru simulare unghiuri camera variabile (±15°)
+4. Re-antrenare cu class weights: [1.0, 2.5, 1.2] pentru echilibrare
+```
 
-
-Măsuri corective propuse:
-1. Esantionare suplimentara in zonele de prag (ex: backrest_height aproape de 0.0).
-2. Reguli post-procesare simple (daca has_backrest = 0, excludem clasa backrest).
-3. Feature engineering: raporturi precum backrest_height / seat_height.
-4. Re-antrenare cu weighting pe clasele cu confuzii mai frecvente.
+**Completați pentru proiectul vostru:**
+```
+1. Creșterea separării în generator pentru seat_height și backrest_height la Bar Chair.
+2. Adăugarea de feature-uri derivate (ex: raport backrest_height / seat_height).
+3. Creșterea numărului de exemple pentru clasele cu leg_count atipic (3 sau 5).
+4. Ajustare class weights pentru a penaliza mai mult confuziile Bar Chair -> Simple Chair.
+```
 
 ---
 
@@ -278,25 +295,29 @@ Structura reala din proiect este:
 
 ```
 Proiect_RN/
-├── README – Etapa 3 -Analiza si Pregatirea Setului de Date pentru Retele Neuronale (1).md
-├── README_Etapa4_Arhitectura_SIA_03.12.2025 (1).md
-├── README_Etapa5_Antrenare_RN (1).md
+├── README – Etapa 3 -Analiza si Pregatirea Setului de Date pentru Retele Neuronale.md
+├── README_Etapa4_Arhitectura_SIA_03.12.2025.md
+├── README_Etapa5_Antrenare_RN.md
+├── README_Etape6_Analiza_Performantei_Optimizare_Concluzii.md
+├── ORDERINE_RULARE.txt
 ├── docs/
 │   ├── state_machine.png
 │   ├── confusion_matrix.png
+│   ├── loss_curve.png
 │   └── screenshots/
 ├── data/
 │   ├── README.md
-│   ├── raw/
+│   ├── cabinets/
+│   ├── chairs/
+│   │   ├── train/
+│   │   ├── validation/
+│   │   └── test/
+│   ├── fridges/
 │   ├── generated/
 │   ├── processed/
-│   ├── train/
-│   ├── validation/
-│   ├── test/
-│   ├── tables/
-│   ├── cabinets/
-│   ├── fridges/
-│   └── stoves/
+│   ├── raw/
+│   ├── stoves/
+│   └── tables/
 ├── src/
 │   ├── data_acquisition/
 │   ├── preprocessing/
@@ -305,6 +326,7 @@ Proiect_RN/
 ├── models/
 │   ├── untrained_model.h5
 │   ├── chair_model.h5
+│   ├── chair_model.onnx
 │   ├── table_model.h5
 │   ├── cabinet_model.h5
 │   ├── fridge_model.h5
@@ -312,6 +334,7 @@ Proiect_RN/
 ├── results/
 │   ├── chair_training_history.csv
 │   ├── chair_test_metrics.json
+│   ├── hyperparameters.yaml
 │   ├── table_training_history.csv
 │   ├── table_training_metrics.json
 │   ├── cabinet_training_history.csv
@@ -335,8 +358,9 @@ Proiect_RN/
 - Adăugat `docs/etapa5_antrenare_model.md` (acest fișier)
 - Adăugat `docs/loss_curve.png` (Nivel 2)
 - Adăugat `models/chair_model.h5` - OBLIGATORIU
+- Adăugat `models/chair_model.onnx` - Export ONNX (Nivel 3)
 - Adăugat `results/` cu history și metrici
-- Adăugat `src/neural_network/train_chair.py` și `evaluate.py`
+- Adăugat `src/neural_network/train_chair.py`, `evaluate.py`, `compare_architectures.py`, `export_onnx.py`
 - Actualizat `src/app/main.py` să încarce model antrenat
 
 ---
@@ -353,10 +377,9 @@ pip install -r requirements.txt
 
 ```bash
 # Combinare + reprocesare dataset complet
-python src/preprocessing/combine_datasets.py
-python src/preprocessing/data_cleaner.py
-python src/preprocessing/feature_engineering.py
-python src/preprocessing/data_splitter.py --stratify --random_state 42
+python src/preprocessing/chair_data_cleaner.py
+python src/preprocessing/chair_feature_scaler.py
+python src/preprocessing/chair_data_splitter.py
 ```
 
 ### 3. Antrenare model
@@ -378,8 +401,8 @@ python src/neural_network/train_chair.py --epochs 50 --batch_size 32 --early_sto
 python src/neural_network/evaluate.py
 
 # Output așteptat:
-# Test Accuracy: 0.9907
-# Test F1-score (macro): 0.9901
+# Test Accuracy: 0.9911
+# Test F1-score (macro): 0.9915
 # ✓ Metrics saved to results/chair_test_metrics.json
 # ✓ Confusion matrix salvată în docs/confusion_matrix.png
 ```
@@ -428,18 +451,18 @@ python src/app/main.py
 - [x] Verificat: predicțiile sunt diferite față de Etapa 4 (când erau random)
 
 ### Documentație Nivel 2 (dacă aplicabil)
-- [ ] Early stopping implementat și documentat în cod
-- [ ] Learning rate scheduler folosit (ReduceLROnPlateau / StepLR)
-- [ ] Augmentări relevante domeniu aplicate (NU rotații simple!)
-- [ ] Grafic loss/val_loss salvat în `docs/loss_curve.png`
-- [ ] Analiză erori în context industrial completată (4 întrebări răspunse)
+- [x] Early stopping implementat și documentat în cod
+- [x] Learning rate scheduler folosit (ReduceLROnPlateau / StepLR)
+- [x] Augmentări relevante domeniu aplicate (NU rotații simple!)
+- [x] Grafic loss/val_loss salvat în `docs/loss_curve.png`
+- [x] Analiză erori în context industrial completată (4 întrebări răspunse)
 - [x] Metrici Nivel 2: **Accuracy ≥75%**, **F1 ≥0.70**
 
 ### Documentație Nivel 3 Bonus (dacă aplicabil)
 - [x] Confusion matrix generată în `docs/confusion_matrix.png`
-- [ ] Comparație 2+ arhitecturi (tabel comparativ + justificare)
-- [ ] Export ONNX/TFLite + benchmark latență (<50ms demonstrat)
-- [ ] Confusion matrix + analiză 5 exemple greșite cu implicații
+- [x] Comparație 2+ arhitecturi (tabel comparativ + justificare)
+- [x] Export ONNX/TFLite + benchmark latență (<50ms demonstrat)
+- [x] Confusion matrix + analiză 5 exemple greșite cu implicații
 
 ### Verificări Tehnice
 - [x] `requirements.txt` actualizat cu toate bibliotecile noi
@@ -456,7 +479,7 @@ python src/app/main.py
 ### Pre-Predare
 - [x] `docs/etapa5_antrenare_model.md` completat cu TOATE secțiunile
 - [x] Structură repository conformă: `docs/`, `results/`, `models/` actualizate
-- [x] Commit: `"Etapa 5 completă – Accuracy=X.XX, F1=X.XX"`
+- [x] Commit: `"Etapa 5 completă – Accuracy=0.9911, F1=0.9915"`
 - [x] Tag: `git tag -a v0.5-model-trained -m "Etapa 5 - Model antrenat"`
 - [x] Push: `git push origin main --tags`
 - [x] Repository accesibil (public sau privat cu acces profesori)
@@ -499,7 +522,7 @@ Exemplu:
 ## Predare și Contact
 
 **Predarea se face prin:**
-1. Commit pe GitHub: `"Etapa 5 completă – Accuracy=X.XX, F1=X.XX"`
+1. Commit pe GitHub: `"Etapa 5 completă – Accuracy=0.9911, F1=0.9915"`
 2. Tag: `git tag -a v0.5-model-trained -m "Etapa 5 - Model antrenat"`
 3. Push: `git push origin main --tags`
 
