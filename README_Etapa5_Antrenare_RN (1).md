@@ -72,20 +72,20 @@ python src/preprocessing/feature_scaler.py
 python src/preprocessing/data_splitter.py
 
 # Verificare finală:
-# data/train/ → trebuie să conțină date vechi + noi
-# data/validation/ → trebuie să conțină date vechi + noi
-# data/test/ → trebuie să conțină date vechi + noi
+# data/chairs/train/ → trebuie să conțină date vechi + noi
+# data/chairs/validation/ → trebuie să conțină date vechi + noi
+# data/chairs/test/ → trebuie să conțină date vechi + noi
 ```
 
 ** ATENȚIE - Folosiți ACEIAȘI parametri de preprocesare:**
-- Același `scaler` salvat în `config/preprocessing_params.pkl`
+- Același `scaler` salvat în `config/chair_scaler.pkl`
 - Aceiași proporții split: 70% train / 15% validation / 15% test
 - Același `random_state=42` pentru reproducibilitate
 
 **Verificare rapidă:**
 ```python
 import pandas as pd
-train = pd.read_csv('data/train/X_train.csv')
+train = pd.read_csv('data/chairs/train/X_train.csv')
 print(f"Train samples: {len(train)}")  # Trebuie să includă date noi
 ```
 
@@ -104,7 +104,7 @@ Completați **TOATE** punctele următoare:
 5. **Metrici calculate pe test set:**
    - **Acuratețe ≥ 65%**
    - **F1-score (macro) ≥ 0.60**
-6. **Salvare model antrenat** în `models/trained_model.h5` (Keras/TensorFlow) sau `.pt` (PyTorch) sau `.lvmodel` (LabVIEW)
+6. **Salvare model antrenat** în `models/chair_model.h5` (Keras/TensorFlow) sau `.pt` (PyTorch) sau `.lvmodel` (LabVIEW)
 7. **Integrare în UI din Etapa 4:**
    - UI trebuie să încarce modelul ANTRENAT (nu dummy)
    - Inferență REALĂ demonstrată
@@ -190,8 +190,8 @@ Antrenarea și inferența trebuie să respecte fluxul din State Machine-ul vostr
 
 | **Stare din Etapa 4** | **Implementare în Etapa 5** |
 |-----------------------|-----------------------------|
-| `ACQUIRE_DATA` | Citire batch date din `data/train/` pentru antrenare |
-| `PREPROCESS` | Aplicare scaler salvat din `config/preprocessing_params.pkl` |
+| `ACQUIRE_DATA` | Citire batch date din `data/chairs/train/` pentru antrenare |
+| `PREPROCESS` | Aplicare scaler salvat din `config/chair_scaler.pkl` |
 | `RN_INFERENCE` | Forward pass cu model ANTRENAT (nu weights random) |
 | `THRESHOLD_CHECK` | Clasificare Normal/Uzură pe baza output RN antrenat |
 | `ALERT` | Trigger în UI bazat pe predicție modelului real |
@@ -206,7 +206,7 @@ model = keras.models.load_model('models/untrained_model.h5')  # weights random
 prediction = model.predict(input_scaled)  # output aproape aleator
 
 # ACUM (Etapa 5 - model antrenat):
-model = keras.models.load_model('models/trained_model.h5')  # weights antrenate
+model = keras.models.load_model('models/chair_model.h5')  # weights antrenate
 prediction = model.predict(input_scaled)  # predicție REALĂ și corectă
 ```
 
@@ -311,14 +311,14 @@ Proiect_RN/
 │   └── app/
 ├── models/
 │   ├── untrained_model.h5
-│   ├── trained_model.h5
+│   ├── chair_model.h5
 │   ├── table_model.h5
 │   ├── cabinet_model.h5
 │   ├── fridge_model.h5
 │   └── stove_model.h5
 ├── results/
-│   ├── training_history.csv
-│   ├── test_metrics.json
+│   ├── chair_training_history.csv
+│   ├── chair_test_metrics.json
 │   ├── table_training_history.csv
 │   ├── table_training_metrics.json
 │   ├── cabinet_training_history.csv
@@ -328,7 +328,7 @@ Proiect_RN/
 │   ├── stove_training_history.csv
 │   └── stove_training_metrics.json
 ├── config/
-│   ├── preprocessing_params.pkl
+│   ├── chair_scaler.pkl
 │   ├── table_scaler.pkl
 │   ├── cabinet_scaler.pkl
 │   ├── fridge_scaler.pkl
@@ -347,9 +347,9 @@ Fisiere recomandate pentru predare (de adaugat inainte de prezentare):
 **Diferențe față de Etapa 4:**
 - Adăugat `docs/etapa5_antrenare_model.md` (acest fișier)
 - Adăugat `docs/loss_curve.png` (Nivel 2)
-- Adăugat `models/trained_model.h5` - OBLIGATORIU
+- Adăugat `models/chair_model.h5` - OBLIGATORIU
 - Adăugat `results/` cu history și metrici
-- Adăugat `src/neural_network/train.py` și `evaluate.py`
+- Adăugat `src/neural_network/train_chair.py` și `evaluate.py`
 - Actualizat `src/app/main.py` să încarce model antrenat
 
 ---
@@ -375,14 +375,14 @@ python src/preprocessing/data_splitter.py --stratify --random_state 42
 ### 3. Antrenare model
 
 ```bash
-python src/neural_network/train.py --epochs 50 --batch_size 32 --early_stopping
+python src/neural_network/train_chair.py --epochs 50 --batch_size 32 --early_stopping
 
 # Output așteptat:
 # Epoch 1/50 - loss: 0.8234 - accuracy: 0.6521 - val_loss: 0.7891 - val_accuracy: 0.6823
 # ...
 # Epoch 23/50 - loss: 0.3456 - accuracy: 0.8234 - val_loss: 0.4123 - val_accuracy: 0.7956
 # Early stopping triggered at epoch 23
-# ✓ Model saved to models/trained_model.h5
+# ✓ Model saved to models/chair_model.h5
 ```
 
 ### 4. Evaluare pe test set
@@ -393,7 +393,7 @@ python src/neural_network/evaluate.py
 # Output așteptat:
 # Test Accuracy: 0.9907
 # Test F1-score (macro): 0.9901
-# ✓ Metrics saved to results/test_metrics.json
+# ✓ Metrics saved to results/chair_test_metrics.json
 # ✓ Confusion matrix salvată în docs/confusion_matrix.png
 ```
 
@@ -424,15 +424,15 @@ python src/app/main.py
 ### Preprocesare și Date
 - [x] Dataset combinat (vechi + nou) preprocesat (dacă ați adăugat date)
 - [x] Split train/val/test: 70/15/15% (verificat dimensiuni fișiere)
-- [x] Scaler din Etapa 3 folosit consistent (`config/preprocessing_params.pkl`)
+- [x] Scaler din Etapa 3 folosit consistent (`config/chair_scaler.pkl`)
 
 ### Antrenare Model - Nivel 1 (OBLIGATORIU)
 - [x] Model antrenat de la ZERO (nu fine-tuning pe model pre-antrenat)
-- [x] Minimum 10 epoci rulate (verificabil în `results/training_history.csv`)
+- [x] Minimum 10 epoci rulate (verificabil în `results/chair_training_history.csv`)
 - [x] Tabel hiperparametri + justificări completat în acest README
 - [x] Metrici calculate pe test set: **Accuracy ≥65%**, **F1 ≥0.60**
-- [x] Model salvat în `models/trained_model.h5` (sau .pt, .lvmodel)
-- [x] `results/training_history.csv` există cu toate epoch-urile
+- [x] Model salvat în `models/chair_model.h5` (sau .pt, .lvmodel)
+- [x] `results/chair_training_history.csv` există cu toate epoch-urile
 
 ### Integrare UI și Demonstrație - Nivel 1 (OBLIGATORIU)
 - [x] Model ANTRENAT încărcat în UI din Etapa 4 (nu model dummy)
@@ -485,11 +485,11 @@ Asigurați-vă că următoarele fișiere există și sunt completate:
    - Metrici test set raportate (accuracy, F1)
    - (Nivel 2) Analiză erori context industrial (4 paragrafe)
 
-2. **`models/trained_model.h5`** (sau `.pt`, `.lvmodel`) - model antrenat funcțional
+2. **`models/chair_model.h5`** (sau `.pt`, `.lvmodel`) - model antrenat funcțional
 
-3. **`results/training_history.csv`** - toate epoch-urile salvate
+3. **`results/chair_training_history.csv`** - toate epoch-urile salvate
 
-4. **`results/test_metrics.json`** - metrici finale:
+4. **`results/chair_test_metrics.json`** - metrici finale:
 
 Exemplu:
 ```json

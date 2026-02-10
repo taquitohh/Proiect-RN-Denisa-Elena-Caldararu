@@ -64,10 +64,10 @@ Deși Etapa 6 încheie ciclul formal de dezvoltare, **procesul iterativ continu�
 
 **Înainte de a începe Etapa 6, verificați că aveți din Etapa 5:**
 
-- [x] **Model antrenat** salvat în `models/trained_model.h5` (sau `.pt`, `.lvmodel`)
+- [x] **Model antrenat** salvat în `models/chair_model.h5` (sau `.pt`, `.lvmodel`)
 - [x] **Metrici baseline** raportate: Accuracy ≥65%, F1-score ≥0.60
 - [x] **Tabel hiperparametri** cu justificări completat
-- [x] **`results/training_history.csv`** cu toate epoch-urile
+- [x] **`results/chair_training_history.csv`** cu toate epoch-urile
 - [x] **UI funcțional** care încarcă modelul antrenat și face inferență reală
 - [ ] **Screenshot inferență** în `docs/screenshots/inference_real.png`
 - [x] **State Machine** implementat conform definiției din Etapa 4
@@ -100,7 +100,7 @@ Documentați **minimum 4 experimente** cu variații sistematice:
 
 | **Exp#** | **Modificare față de Baseline (Etapa 5)** | **Accuracy** | **F1-score** | **Timp antrenare** | **Observații** |
 |----------|------------------------------------------|--------------|--------------|-------------------|----------------|
-| Baseline | Configurația din Etapa 5 | 0.9907 | 0.9901 | n/a | Metrici din `results/test_metrics.json` |
+| Baseline | Configurația din Etapa 5 | 0.9907 | 0.9901 | n/a | Metrici din `results/chair_test_metrics.json` |
 | Exp 1 | n/a (neexecutat) | n/a | n/a | n/a | Neexecutat în acest repo |
 | Exp 2 | n/a (neexecutat) | n/a | n/a | n/a | Neexecutat în acest repo |
 | Exp 3 | n/a (neexecutat) | n/a | n/a | n/a | Neexecutat în acest repo |
@@ -127,7 +127,7 @@ Modelul de referință a rămas cel din Etapa 5.
 
 | **Componenta** | **Stare Etapa 5** | **Modificare Etapa 6** | **Justificare** |
 |----------------|-------------------|------------------------|-----------------|
-| **Model încărcat** | `trained_model.h5` | n/a (neimplementat) | Etapa 6 nu a fost executată |
+| **Model încărcat** | `chair_model.h5` | n/a (neimplementat) | Etapa 6 nu a fost executată |
 | **State Machine** | IDLE → USER_INPUT → PREPROCESS → RN_INFERENCE → SCRIPT_GENERATION → DISPLAY → IDLE | n/a (neimplementat) | Nu s-au făcut modificări |
 | **UI - afișare rezultate** | text + probabilități + script | n/a (neimplementat) | UI a rămas neschimbat |
 | **Logging** | n/a | n/a (neimplementat) | Nu s-a introdus logging suplimentar |
@@ -463,7 +463,7 @@ proiect-rn-[prenume-nume]/
 │   ├── preprocessing/                      # Din Etapa 3
 │   ├── neural_network/
 │   │   ├── model.py                        # Din Etapa 4
-│   │   ├── train.py                        # Din Etapa 5
+│   │   ├── train_chair.py                  # Din Etapa 5
 │   │   ├── evaluate.py                     # Din Etapa 5
 │   │   └── optimize.py                     # NOU - Script optimizare/tuning
 │   └── app/
@@ -471,17 +471,17 @@ proiect-rn-[prenume-nume]/
 │
 ├── models/
 │   ├── untrained_model.h5                  # Din Etapa 4
-│   ├── trained_model.h5                    # Din Etapa 5
+│   ├── chair_model.h5                      # Din Etapa 5
 │   ├── optimized_model.h5                  # NOU - OBLIGATORIU
 │
 ├── results/
-│   ├── training_history.csv                # Din Etapa 5
-│   ├── test_metrics.json                   # Din Etapa 5
+│   ├── chair_training_history.csv          # Din Etapa 5
+│   ├── chair_test_metrics.json             # Din Etapa 5
 │   ├── optimization_experiments.csv        # NOU - OBLIGATORIU
 │   ├── final_metrics.json                  # NOU - Metrici model optimizat
 │
 ├── config/
-│   ├── preprocessing_params.pkl            # Din Etapa 3
+│   ├── chair_scaler.pkl                    # Din Etapa 3
 │   └── optimized_config.yaml               # NOU - Config model final
 │
 ├── requirements.txt                        # Actualizat
@@ -507,10 +507,10 @@ proiect-rn-[prenume-nume]/
 
 ```bash
 # Opțiunea A - Manual (minimum 4 experimente)
-python src/neural_network/train.py --lr 0.001 --batch 32 --epochs 100 --name exp1
-python src/neural_network/train.py --lr 0.0001 --batch 32 --epochs 100 --name exp2
-python src/neural_network/train.py --lr 0.001 --batch 64 --epochs 100 --name exp3
-python src/neural_network/train.py --lr 0.001 --batch 32 --dropout 0.5 --epochs 100 --name exp4
+python src/neural_network/train_chair.py --lr 0.001 --batch 32 --epochs 100 --name exp1
+python src/neural_network/train_chair.py --lr 0.0001 --batch 32 --epochs 100 --name exp2
+python src/neural_network/train_chair.py --lr 0.001 --batch 64 --epochs 100 --name exp3
+python src/neural_network/train_chair.py --lr 0.001 --batch 32 --dropout 0.5 --epochs 100 --name exp4
 ```
 
 ### 2. Evaluare și comparare
@@ -531,7 +531,7 @@ python src/neural_network/evaluate.py
 python src/app/main.py
 
 # În consolă trebuie să vedeți:
-# Loading model: models/trained_model.h5
+# Loading model: models/chair_model.h5
 # Model loaded successfully.
 ```
 
@@ -552,7 +552,7 @@ N/A – scriptul `src/neural_network/visualize.py` nu există în acest repo.
 ## Checklist Final – Bifați Totul Înainte de Predare
 
 ### Prerequisite Etapa 5 (verificare)
-- [x] Model antrenat există în `models/trained_model.h5`
+- [x] Model antrenat există în `models/chair_model.h5`
 - [x] Metrici baseline raportate (Accuracy ≥65%, F1 ≥0.60)
 - [x] UI funcțional cu model antrenat
 - [x] State Machine implementat

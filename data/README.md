@@ -79,7 +79,7 @@ Toate dataset-urile sunt generate programatic cu seed fix pentru reproductibilit
 - Date curatate: data/processed/*_clean.csv
 - Date scalate: data/processed/*_scaled.csv
 - Seturi splitate:
-  - Scaune: data/train, data/validation, data/test
+  - Scaune: data/chairs/train, data/chairs/validation, data/chairs/test
   - Mese: data/tables/train, data/tables/validation, data/tables/test
   - Dulapuri: data/cabinets/train, data/cabinets/validation, data/cabinets/test
   - Frigidere: data/fridges/train, data/fridges/validation, data/fridges/test

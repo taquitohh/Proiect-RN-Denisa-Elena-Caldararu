@@ -7,9 +7,9 @@ from sklearn.model_selection import train_test_split
 
 
 INPUT_PATH = os.path.join("data", "processed", "chairs_scaled.csv")
-TRAIN_DIR = os.path.join("data", "train")
-VAL_DIR = os.path.join("data", "validation")
-TEST_DIR = os.path.join("data", "test")
+TRAIN_DIR = os.path.join("data", "chairs", "train")
+VAL_DIR = os.path.join("data", "chairs", "validation")
+TEST_DIR = os.path.join("data", "chairs", "test")
 
 RANDOM_STATE = 42
 

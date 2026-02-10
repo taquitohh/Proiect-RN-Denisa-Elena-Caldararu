@@ -178,6 +178,21 @@ Starile principale sunt:
 5. RENDER_PREVIEW: cerere catre Blender API pentru randare.
 6. DISPLAY_RESULT: afisarea rezultatelor in UI.
 
+Schema (simplificata):
+```
+[IDLE]
+  ↓ (input valid)
+[PREPROCESS]
+  ↓
+[RN_INFERENCE]
+  ↓
+[GENERATE_SCRIPT]
+  ↓
+[RENDER_PREVIEW]
+   ├─(OK)→ [DISPLAY_RESULT] → [IDLE]
+   └─(ERROR)→ [ERROR] → [DISPLAY_RESULT] → [IDLE]
+```
+
 Tranzitii critice:
 - PREPROCESS → RN_INFERENCE: cand inputul este validat.
 - RENDER_PREVIEW → ERROR: daca Blender API nu raspunde.

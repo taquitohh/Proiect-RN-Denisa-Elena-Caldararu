@@ -9,7 +9,7 @@ from sklearn.preprocessing import StandardScaler
 
 INPUT_PATH = os.path.join("data", "processed", "chairs_clean.csv")
 OUTPUT_PATH = os.path.join("data", "processed", "chairs_scaled.csv")
-SCALER_PATH = os.path.join("config", "preprocessing_params.pkl")
+SCALER_PATH = os.path.join("config", "chair_scaler.pkl")
 
 
 def main() -> None:

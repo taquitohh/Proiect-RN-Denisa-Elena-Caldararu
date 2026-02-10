@@ -17,7 +17,7 @@ In Etapa 4, arhitectura este definita si compilata, fara antrenare serioasa.
 
 ## Fisiere relevante
 - `model.py`: definirea si compilarea modelului.
-- `train.py` / `train_*.py`: antrenare specifica per obiect.
+- `train_chair.py` / `train_*.py`: antrenare specifica per obiect.
 - `evaluate.py`: evaluare model.
 
 ## Note

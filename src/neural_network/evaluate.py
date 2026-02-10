@@ -2,7 +2,7 @@
 
 This script loads the trained model and the test dataset, runs inference,
 computes Accuracy and F1-score (macro), prints the metrics, and saves them
-in results/test_metrics.json. It optionally saves a confusion matrix plot to
+in results/chair_test_metrics.json. It optionally saves a confusion matrix plot to
 `docs/confusion_matrix.png` if matplotlib is available.
 """
 
@@ -17,9 +17,9 @@ import pandas as pd
 import tensorflow as tf
 
 
-DATA_DIR = Path("data")
-MODEL_PATH = Path("models") / "trained_model.h5"
-RESULTS_PATH = Path("results") / "test_metrics.json"
+DATA_DIR = Path("data") / "chairs"
+MODEL_PATH = Path("models") / "chair_model.h5"
+RESULTS_PATH = Path("results") / "chair_test_metrics.json"
 CONFUSION_PATH = Path("docs") / "confusion_matrix.png"
 
 

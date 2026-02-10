@@ -56,14 +56,14 @@ LABEL_MAPS = {
 }
 
 SCALER_PATHS = {
-    "chair": os.path.join("config", "preprocessing_params.pkl"),
+    "chair": os.path.join("config", "chair_scaler.pkl"),
     "table": os.path.join("config", "table_scaler.pkl"),
     "cabinet": os.path.join("config", "cabinet_scaler.pkl"),
     "fridge": os.path.join("config", "fridge_scaler.pkl"),
     "stove": os.path.join("config", "stove_scaler.pkl"),
 }
 MODEL_PATHS = {
-    "chair": os.path.join("models", "trained_model.h5"),
+    "chair": os.path.join("models", "chair_model.h5"),
     "table": os.path.join("models", "table_model.h5"),
     "cabinet": os.path.join("models", "cabinet_model.h5"),
     "fridge": os.path.join("models", "fridge_model.h5"),

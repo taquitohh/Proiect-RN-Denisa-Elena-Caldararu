@@ -130,7 +130,7 @@ Exemple de verificare:
 
 * Date preprocesate în `data/processed/`
 * Seturi train/val/test în foldere dedicate
-* Parametrii de preprocesare în `config/preprocessing_params.pkl`
+* Parametrii de preprocesare în `config/chair_scaler.pkl`
 
 ---
 
@@ -138,7 +138,7 @@ Exemple de verificare:
 
 * `data/raw/` – date brute
 * `data/processed/` – date curățate & transformate
-* `data/train/`, `data/validation/`, `data/test/` – seturi finale
+* `data/chairs/train/`, `data/chairs/validation/`, `data/chairs/test/` – seturi finale
 * `src/preprocessing/` – codul de preprocesare
 * `data/README.md` – descrierea dataset-ului
 

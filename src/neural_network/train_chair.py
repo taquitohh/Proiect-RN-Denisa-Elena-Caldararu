@@ -22,7 +22,7 @@ import tensorflow as tf
 from src.neural_network.model import build_model
 
 
-DATA_DIR = Path("data")
+DATA_DIR = Path("data") / "chairs"
 MODELS_DIR = Path("models")
 RESULTS_DIR = Path("results")
 
@@ -63,10 +63,10 @@ def train(epochs: int = 10, batch_size: int = 32) -> None:
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
-    model.save(MODELS_DIR / "trained_model.h5")
+    model.save(MODELS_DIR / "chair_model.h5")
 
     history_df = pd.DataFrame(history.history)
-    history_df.to_csv(RESULTS_DIR / "training_history.csv", index=False)
+    history_df.to_csv(RESULTS_DIR / "chair_training_history.csv", index=False)
 
     final_train_acc = history.history.get("accuracy", [None])[-1]
     final_val_acc = history.history.get("val_accuracy", [None])[-1]

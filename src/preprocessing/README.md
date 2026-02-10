@@ -14,7 +14,7 @@ This module converts the raw synthetic dataset into clean, scaled, and split dat
    - Separates features (X) from the label (y).
    - Applies `StandardScaler` **only** to feature columns.
    - Saves the scaled dataset to `data/processed/chairs_scaled.csv`.
-   - Persists the scaler to `config/preprocessing_params.pkl` for reuse in later stages.
+   - Persists the scaler to `config/chair_scaler.pkl` for reuse in later stages.
 
 3. **Data splitting**
    - Loads `data/processed/chairs_scaled.csv`.
@@ -22,17 +22,17 @@ This module converts the raw synthetic dataset into clean, scaled, and split dat
      - 70% train
      - 15% validation
      - 15% test
-   - Saves outputs to:
-     - `data/train/X_train.csv`, `data/train/y_train.csv`
-     - `data/validation/X_val.csv`, `data/validation/y_val.csv`
-     - `data/test/X_test.csv`, `data/test/y_test.csv`
+    - Saves outputs to:
+       - `data/chairs/train/X_train.csv`, `data/chairs/train/y_train.csv`
+       - `data/chairs/validation/X_val.csv`, `data/chairs/validation/y_val.csv`
+       - `data/chairs/test/X_test.csv`, `data/chairs/test/y_test.csv`
 
 ## Why scaling before split
 
-Scaling is done **before** splitting to ensure a single, consistent transformation is applied across the entire dataset and reused identically in later stages (Etapa 5 and 6). This guarantees reproducibility with a fixed scaler saved to `config/preprocessing_params.pkl`.
+Scaling is done **before** splitting to ensure a single, consistent transformation is applied across the entire dataset and reused identically in later stages (Etapa 5 and 6). This guarantees reproducibility with a fixed scaler saved to `config/chair_scaler.pkl`.
 
 ## Run Order
 
-1. `python src/preprocessing/data_cleaner.py`
-2. `python src/preprocessing/feature_scaler.py`
-3. `python src/preprocessing/data_splitter.py`
+1. `python src/preprocessing/chair_data_cleaner.py`
+2. `python src/preprocessing/chair_feature_scaler.py`
+3. `python src/preprocessing/chair_data_splitter.py`
