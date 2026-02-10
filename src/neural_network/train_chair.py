@@ -1,10 +1,9 @@
-"""Training pipeline for the neural network model (Etapa 5.2).
+"""Pipeline de antrenare pentru modelul RN (Etapa 5.2).
 
-This script performs training with basic regularization features (early stopping,
-learning rate scheduling) and light tabular augmentation.
-It loads the final preprocessed datasets, builds the MLP model defined in
-src/neural_network/model.py, compiles it, trains it, and saves both the trained
-model and training history.
+Scriptul antreneaza modelul cu regularizare de baza (early stopping,
+reduce LR) si augmentare tabulara usoara.
+Incarca seturile preprocesate, construieste MLP-ul, il antreneaza
+si salveaza modelul si istoricul de antrenare.
 """
 
 from __future__ import annotations
@@ -24,13 +23,15 @@ import tensorflow as tf
 from src.neural_network.model import build_model
 
 
+# Cai pentru dataset si artefacte (model/rezultate).
 DATA_DIR = Path("data") / "chairs"
 MODELS_DIR = Path("models")
 RESULTS_DIR = Path("results")
 
 
 def load_datasets() -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series]:
-    """Load train and validation datasets from CSV files."""
+    """Incarca dataset-urile train si validation din CSV."""
+    # Incarca features si label-uri pentru train/validation.
     x_train = pd.read_csv(DATA_DIR / "train" / "X_train.csv")
     y_train = pd.read_csv(DATA_DIR / "train" / "y_train.csv").squeeze()
     x_val = pd.read_csv(DATA_DIR / "validation" / "X_val.csv")
@@ -39,7 +40,8 @@ def load_datasets() -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series]:
 
 
 def augment_tabular(x_train: pd.DataFrame, y_train: pd.Series) -> Tuple[pd.DataFrame, pd.Series]:
-    """Apply light Gaussian noise to continuous features only."""
+    """Aplica zgomot gaussian usor doar pe features continue."""
+    # Aplica zgomot doar pe coloanele continue pentru a pastra semnificatia categorica.
     continuous_cols = [
         "seat_height",
         "seat_width",
@@ -49,10 +51,12 @@ def augment_tabular(x_train: pd.DataFrame, y_train: pd.Series) -> Tuple[pd.DataF
     ]
 
     x_aug = x_train.copy()
+    # Scara zgomotului foloseste abaterea standard pe fiecare coloana.
     std = x_train[continuous_cols].std().fillna(0.0)
     noise = np.random.normal(loc=0.0, scale=0.02 * std.values, size=x_aug[continuous_cols].shape)
     x_aug[continuous_cols] = x_aug[continuous_cols] + noise
 
+    # Reaplica regula pentru spatar dupa perturbare.
     if "has_backrest" in x_aug.columns:
         x_aug.loc[x_aug["has_backrest"] == 0, "backrest_height"] = 0.0
 
@@ -62,13 +66,15 @@ def augment_tabular(x_train: pd.DataFrame, y_train: pd.Series) -> Tuple[pd.DataF
 
 
 def train(epochs: int = 10, batch_size: int = 32) -> None:
-    """Train the model with baseline hyperparameters and save outputs."""
+    """Antreneaza modelul cu hiperparametri baseline si salveaza output-urile."""
+    # Pregateste datele si aplica augmentarea.
     x_train, y_train, x_val, y_val = load_datasets()
     x_train, y_train = augment_tabular(x_train, y_train)
 
     input_dim = x_train.shape[1]
     num_classes = int(pd.Series(y_train).nunique())
 
+    # Construieste si compileaza modelul MLP.
     model = build_model(input_dim=input_dim, num_classes=num_classes)
 
     model.compile(
@@ -77,6 +83,7 @@ def train(epochs: int = 10, batch_size: int = 32) -> None:
         metrics=["accuracy"],
     )
 
+    # Callback-uri pentru stabilitate si adaptarea ratei de invatare.
     callbacks = [
         tf.keras.callbacks.EarlyStopping(
             monitor="val_loss",
@@ -91,6 +98,7 @@ def train(epochs: int = 10, batch_size: int = 32) -> None:
         ),
     ]
 
+    # Antreneaza modelul si retine istoricul.
     history = model.fit(
         x_train,
         y_train,
@@ -104,6 +112,7 @@ def train(epochs: int = 10, batch_size: int = 32) -> None:
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
+    # Salveaza modelul si artefactele de antrenare.
     model.save(MODELS_DIR / "chair_model.h5")
 
     history_df = pd.DataFrame(history.history)

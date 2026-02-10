@@ -1,4 +1,4 @@
-"""Flask UI for chair type classification and Blender script generation."""
+"""UI Flask pentru clasificare si generare de script Blender."""
 
 from __future__ import annotations
 
@@ -16,6 +16,7 @@ import pandas as pd
 from flask import Flask, jsonify, render_template_string, request
 from tensorflow import keras
 
+# Permite rularea aplicatiei din orice director prin setarea sys.path.
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
@@ -27,6 +28,7 @@ from src.blender_scripts.fridge_generator import generate_fridge_script
 from src.blender_scripts.stove_generator import generate_stove_script
 
 
+# Etichete lizibile pentru fiecare tip de obiect.
 LABEL_MAPS = {
     "chair": {
         0: "Simple Chair",
@@ -55,6 +57,7 @@ LABEL_MAPS = {
     },
 }
 
+# Cai catre scaler pentru fiecare tip de obiect.
 SCALER_PATHS = {
     "chair": os.path.join("config", "chair_scaler.pkl"),
     "table": os.path.join("config", "table_scaler.pkl"),
@@ -62,6 +65,7 @@ SCALER_PATHS = {
     "fridge": os.path.join("config", "fridge_scaler.pkl"),
     "stove": os.path.join("config", "stove_scaler.pkl"),
 }
+# Cai catre modele pentru fiecare tip de obiect.
 MODEL_PATHS = {
     "chair": os.path.join("models", "chair_model.h5"),
     "table": os.path.join("models", "table_model.h5"),
@@ -69,6 +73,7 @@ MODEL_PATHS = {
     "fridge": os.path.join("models", "fridge_model.h5"),
     "stove": os.path.join("models", "stove_model.h5"),
 }
+# Endpoint local pentru Blender API (suprascriere prin env var daca e nevoie).
 BLENDER_API_URL = os.environ.get("BLENDER_API_URL", "http://127.0.0.1:5001/render")
 
 
@@ -83,14 +88,17 @@ def load_model(path: str) -> keras.Model:
     return keras.models.load_model(path)
 
 
+# Cache pentru modele/scalere ca sa evitam reload-ul la fiecare request.
 ARTIFACT_CACHE: dict[str, tuple[keras.Model, object]] = {}
 
 
 def load_artifacts(object_type: str) -> tuple[keras.Model, object]:
     """Load model and scaler on demand for a given object type."""
+    # Returneaza din cache daca artefactele sunt deja incarcate.
     if object_type in ARTIFACT_CACHE:
         return ARTIFACT_CACHE[object_type]
 
+    # Rezolva caile si valideaza tipul obiectului.
     scaler_path = SCALER_PATHS.get(object_type)
     model_path = MODEL_PATHS.get(object_type)
     if not scaler_path or not model_path:
@@ -100,6 +108,7 @@ def load_artifacts(object_type: str) -> tuple[keras.Model, object]:
     if not os.path.exists(model_path):
         raise FileNotFoundError("Model not found. Please train the model first.")
 
+    # Incarca artefactele o singura data si le tine in cache.
     print(f"Loading model: {model_path}")
     scaler = load_scaler(scaler_path)
     model = load_model(model_path)
@@ -109,6 +118,7 @@ def load_artifacts(object_type: str) -> tuple[keras.Model, object]:
 
 
 def check_blender_api(timeout: float = 1.2) -> tuple[bool, str | None]:
+    # Request OPTIONS rapid pentru a verifica disponibilitatea Blender API.
     request_obj = urllib.request.Request(BLENDER_API_URL, method="OPTIONS")
     try:
         with urllib.request.urlopen(request_obj, timeout=timeout) as response:
@@ -119,6 +129,7 @@ def check_blender_api(timeout: float = 1.2) -> tuple[bool, str | None]:
         return False, str(exc)
 
 
+# Schema de features pentru fiecare tip de obiect (folosita la input).
 FEATURE_COLUMNS = {
     "chair": [
         "seat_height",
@@ -174,6 +185,7 @@ FEATURE_COLUMNS = {
 
 def build_input_array(object_type: str, values: dict) -> pd.DataFrame:
     """Build a DataFrame with feature names to match scaler training."""
+    # Mapeaza inputurile UI in ordinea asteptata de model.
     if object_type == "table":
         row = {
             "table_height": values["table_height"],
@@ -231,11 +243,13 @@ def build_input_array(object_type: str, values: dict) -> pd.DataFrame:
     return pd.DataFrame([row], columns=FEATURE_COLUMNS[object_type])
 
 
+# Instanta Flask.
 app = Flask(__name__)
 
 
 @app.route("/status", methods=["GET"])
 def status():
+    # Ofera info de status pentru panoul UI.
     blender_ok, blender_error = check_blender_api()
     chair_ok = os.path.exists(SCALER_PATHS["chair"]) and os.path.exists(MODEL_PATHS["chair"])
     return jsonify(
@@ -249,6 +263,7 @@ def status():
     )
 
 
+# Template HTML/CSS/JS inline servit de Flask.
 HTML_TEMPLATE = """
 <!doctype html>
 <html lang="en">
@@ -1347,21 +1362,25 @@ HTML_TEMPLATE = """
 
 
 def parse_float(name: str, default: float) -> float:
-        value = request.form.get(name, default)
-        return float(value)
+    # Parseaza float din formular, cu default daca lipseste.
+    value = request.form.get(name, default)
+    return float(value)
 
 
 def parse_int(name: str, default: int) -> int:
-        value = request.form.get(name, default)
-        return int(value)
+    # Parseaza int din formular, cu default daca lipseste.
+    value = request.form.get(name, default)
+    return int(value)
 
 
 def parse_str(name: str, default: str) -> str:
+    # Parseaza string din formular, cu default daca lipseste.
     value = request.form.get(name, default)
     return str(value)
 
 
 def request_preview(payload: dict) -> tuple[str | None, str | None]:
+    # Trimite payload la Blender API si returneaza imaginea base64 sau eroare.
     try:
         data = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(
@@ -1388,6 +1407,7 @@ def request_preview(payload: dict) -> tuple[str | None, str | None]:
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    # Valori default pentru primul render si fallback-uri.
         values = {
                 "object_type": "chair",
                 "seat_height": 0.55,
@@ -1434,13 +1454,16 @@ def index():
             "rotate_pitch": 15.0,
         }
 
+        # Payload final pentru randarea template-ului.
         result = None
         if request.method == "POST":
-                values["object_type"] = parse_str("object_type", values["object_type"])
+                # Stabileste tipul obiectului pentru a sti ce campuri se parseaza.
+            values["object_type"] = parse_str("object_type", values["object_type"])
                 object_type = values["object_type"] if values["object_type"] in LABEL_MAPS else "chair"
                 values["object_type"] = object_type
 
                 if object_type == "table":
+                    # Parseaza inputurile table, ruleaza inferenta si genereaza script Blender.
                     values["table_height"] = parse_float("table_height", values["table_height"])
                     values["table_width"] = parse_float("table_width", values["table_width"])
                     values["table_depth"] = parse_float("table_depth", values["table_depth"])
@@ -1484,6 +1507,7 @@ def index():
                         preview_src = f"data:image/png;base64,{preview_image}"
                     label_map = LABEL_MAPS["table"]
                 elif object_type == "cabinet":
+                    # Parseaza inputurile cabinet, ruleaza inferenta si genereaza script Blender.
                     values["cabinet_height"] = parse_float("cabinet_height", values["cabinet_height"])
                     values["cabinet_width"] = parse_float("cabinet_width", values["cabinet_width"])
                     values["cabinet_depth"] = parse_float("cabinet_depth", values["cabinet_depth"])
@@ -1527,6 +1551,7 @@ def index():
                         preview_src = f"data:image/png;base64,{preview_image}"
                     label_map = LABEL_MAPS["cabinet"]
                 elif object_type == "fridge":
+                    # Parseaza inputurile fridge, ruleaza inferenta si genereaza script Blender.
                     values["fridge_height"] = parse_float("fridge_height", values["fridge_height"])
                     values["fridge_width"] = parse_float("fridge_width", values["fridge_width"])
                     values["fridge_depth"] = parse_float("fridge_depth", values["fridge_depth"])
@@ -1573,6 +1598,7 @@ def index():
                         preview_src = f"data:image/png;base64,{preview_image}"
                     label_map = LABEL_MAPS["fridge"]
                 elif object_type == "stove":
+                    # Parseaza inputurile stove, ruleaza inferenta si genereaza script Blender.
                     values["stove_height"] = parse_float("stove_height", values["stove_height"])
                     values["stove_width"] = parse_float("stove_width", values["stove_width"])
                     values["stove_depth"] = parse_float("stove_depth", values["stove_depth"])
@@ -1618,6 +1644,7 @@ def index():
                         preview_src = f"data:image/png;base64,{preview_image}"
                     label_map = LABEL_MAPS["stove"]
                 else:
+                    # Parseaza inputurile chair, ruleaza inferenta si genereaza script Blender.
                     values["seat_height"] = parse_float("seat_height", values["seat_height"])
                     values["seat_width"] = parse_float("seat_width", values["seat_width"])
                     values["seat_depth"] = parse_float("seat_depth", values["seat_depth"])

@@ -12,13 +12,16 @@ def generate_table_script(
     has_apron: int,
     style_variant: int,
 ) -> str:
+    # Limiteaza inputurile si aplica un mic offset de stil.
     leg_count = max(3, min(4, int(leg_count)))
     has_apron = 1 if int(has_apron) == 1 else 0
     style_adjust = {0: 0.0, 1: 0.02, 2: -0.02}.get(int(style_variant), 0.0)
 
+    # Construieste un script Blender cu pasi expliciti de geometrie.
     script = f"""
 import bpy
 
+# CURATA SCENA
 bpy.ops.object.select_all(action='SELECT')
 bpy.ops.object.delete(use_global=False)
 
@@ -34,14 +37,14 @@ top_thickness = max(0.04, min(table_height * 0.3, table_height * 0.1 + style_adj
 leg_height = table_height - top_thickness
 leg_radius = leg_thickness / 2
 
-# TABLE TOP
+# BLAT
 bpy.ops.mesh.primitive_cube_add(size=2)
 top = bpy.context.active_object
 top.name = "TableTop"
 top.scale = (table_width / 2, table_depth / 2, top_thickness / 2)
 top.location = (0, 0, leg_height + top_thickness / 2)
 
-# LEGS
+# PICIOARE
 x_offset = table_width / 2 - leg_radius
 y_offset = table_depth / 2 - leg_radius
 
@@ -60,7 +63,7 @@ for i, (x, y) in enumerate(positions):
     leg.location = (x, y, leg_height / 2)
     legs.append(leg)
 
-# APRON
+# SORT (cadru optional sub blat)
 if has_apron == 1:
     apron_height = leg_thickness
     apron_z = leg_height - apron_height / 2
@@ -106,7 +109,7 @@ if has_apron == 1:
     apron_right.location = (x_offset - leg_radius, 0, apron_z)
     apron_parts.append(apron_right)
 
-# JOIN
+# JOIN (uneste toate piesele intr-un singur obiect)
 bpy.ops.object.select_all(action='DESELECT')
 top.select_set(True)
 for leg in legs:

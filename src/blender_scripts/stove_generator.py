@@ -12,11 +12,14 @@ def generate_stove_script(
     glass_thickness: float,
     style_variant: int,
 ) -> str:
+    # Normalizeaza optiunile discrete la intervalele asteptate.
     style_variant = int(style_variant)
 
+    # Construieste un script Blender cu pasi expliciti de geometrie.
     script = f"""
 import bpy
 
+# CURATA SCENA
 bpy.ops.object.select_all(action='SELECT')
 bpy.ops.object.delete(use_global=False)
 
@@ -28,14 +31,14 @@ handle_length = {handle_length}
 glass_thickness = {glass_thickness}
 style_variant = {style_variant}
 
-# BODY
+# CORP
 bpy.ops.mesh.primitive_cube_add(size=2)
 body = bpy.context.active_object
 body.name = "StoveBody"
 body.scale = (stove_width / 2, stove_depth / 2, stove_height / 2)
 body.location = (0, 0, stove_height / 2)
 
-# OVEN CAVITY (boolean cut)
+# CAVITATE CUPTOR (decupaj boolean)
 oven_height = stove_height * oven_height_ratio
 cavity_width = stove_width * 0.75
 cavity_depth = stove_depth * 0.7
@@ -59,14 +62,14 @@ bpy.ops.object.select_all(action='DESELECT')
 cavity.select_set(True)
 bpy.ops.object.delete(use_global=False)
 
-# COOKTOP
+# PLITA
 cooktop_thickness = max(0.02, stove_height * 0.04)
 bpy.ops.mesh.primitive_cube_add(size=2)
 cooktop = bpy.context.active_object
 cooktop.scale = (stove_width / 2, stove_depth / 2, cooktop_thickness / 2)
 cooktop.location = (0, 0, stove_height + cooktop_thickness / 2)
 
-# BURNERS (4)
+# ARZATOARE (4)
 burners = []
 burner_radius = stove_width * 0.08
 burner_height = cooktop_thickness * 0.6
@@ -80,7 +83,7 @@ for x in (-x_offset, x_offset):
         burner.location = (x, y, stove_height + cooktop_thickness + burner_height / 2)
         burners.append(burner)
 
-# KNOBS (6)
+# BUTOANE (6)
 knobs = []
 knob_radius = max(0.01, stove_width * 0.02)
 knob_depth = max(0.02, stove_depth * 0.06)
@@ -102,7 +105,7 @@ for x in knob_x_offsets:
     knob.location = (x, knob_y, knob_z)
     knobs.append(knob)
 
-# OVEN DOOR + GLASS
+# USA CUPTOR + STICLA
 front_y = stove_depth / 2
 bpy.ops.mesh.primitive_cube_add(size=2)
 door = bpy.context.active_object
@@ -115,13 +118,13 @@ window = bpy.context.active_object
 window.scale = (stove_width * 0.28, glass_thickness / 2, oven_height * 0.22)
 window.location = (0, front_y + door_thickness / 2 + glass_thickness / 2, oven_height * 0.5)
 
-# DOOR HANDLE
+# MANER USA
 bpy.ops.mesh.primitive_cylinder_add(radius=knob_radius, depth=handle_length)
 handle = bpy.context.active_object
 handle.rotation_euler = (0.0, 1.5708, 0.0)
 handle.location = (0, front_y + door_thickness + knob_radius, oven_height * 0.78)
 
-# JOIN
+# JOIN (uneste toate piesele intr-un singur obiect)
 bpy.ops.object.select_all(action='DESELECT')
 body.select_set(True)
 cooktop.select_set(True)

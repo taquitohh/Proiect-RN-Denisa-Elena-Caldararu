@@ -1,7 +1,7 @@
-"""Generate a synthetic chair dataset for neural network training.
+"""Genereaza dataset sintetic de scaune pentru antrenare.
 
-This script creates a reproducible dataset of chair parameters and labels
-based on deterministic rules defined in the project specification.
+Scriptul creeaza un set reproductibil de parametri si etichete,
+folosind reguli deterministe din specificatie.
 """
 
 import os
@@ -11,11 +11,11 @@ from typing import Dict
 import numpy as np
 import pandas as pd
 
-# Global parameters
+# Parametri globali pentru dimensiunea dataset-ului si reproductibilitate.
 NUM_SAMPLES = 15000
 RANDOM_SEED = 42
 
-# Feature ranges and options
+# Intervalele si optiunile pentru features (constrangeri de domeniu).
 SEAT_HEIGHT_RANGE = (0.4, 0.8)
 SEAT_WIDTH_RANGE = (0.35, 0.6)
 SEAT_DEPTH_RANGE = (0.35, 0.6)
@@ -27,13 +27,15 @@ STYLE_VARIANT_OPTIONS = (0, 1, 2)
 
 
 def set_random_seed(seed: int) -> None:
-    """Set random seeds for reproducibility."""
+    """Seteaza seed-urile pentru reproductibilitate."""
+    # Aliniaza RNG-urile Python si NumPy pentru dataset determinist.
     random.seed(seed)
     np.random.seed(seed)
 
 
 def generate_sample() -> Dict[str, float]:
-    """Generate a single chair sample with valid feature values."""
+    """Genereaza un sample de scaun cu valori valide pentru features."""
+    # Genereaza valori in intervalele permise.
     seat_height = random.uniform(*SEAT_HEIGHT_RANGE)
     seat_width = random.uniform(*SEAT_WIDTH_RANGE)
     seat_depth = random.uniform(*SEAT_DEPTH_RANGE)
@@ -41,6 +43,7 @@ def generate_sample() -> Dict[str, float]:
     leg_thickness = random.uniform(*LEG_THICKNESS_RANGE)
     has_backrest = random.choice(HAS_BACKREST_OPTIONS)
 
+    # Inaltimea spatarului are sens doar daca exista spatar.
     if has_backrest == 1:
         backrest_height = random.uniform(*BACKREST_HEIGHT_RANGE)
     else:
@@ -61,7 +64,8 @@ def generate_sample() -> Dict[str, float]:
 
 
 def assign_label(sample: Dict[str, float]) -> int:
-    """Assign label based on deterministic rules and required order."""
+    """Atribuie eticheta pe baza regulilor deterministe."""
+    # Etichetare pe baza regulilor din specificatie.
     seat_height = sample["seat_height"]
     has_backrest = sample["has_backrest"]
     backrest_height = sample["backrest_height"]
@@ -76,7 +80,8 @@ def assign_label(sample: Dict[str, float]) -> int:
 
 
 def build_dataset(num_samples: int) -> pd.DataFrame:
-    """Build the full dataset as a pandas DataFrame."""
+    """Construieste dataset-ul complet ca DataFrame."""
+    # Genereaza mostre etichetate si impune ordinea coloanelor.
     samples = []
     for _ in range(num_samples):
         sample = generate_sample()
@@ -101,19 +106,22 @@ def build_dataset(num_samples: int) -> pd.DataFrame:
 
 
 def validate_dataset(df: pd.DataFrame) -> None:
-    """Run minimal validations required by specification."""
+    """Ruleaza validarile minime cerute de specificatie."""
+    # Regula de baza: backrest_height trebuie 0 cand has_backrest este 0.
     invalid_backrest = df[(df["has_backrest"] == 0) & (df["backrest_height"] != 0)]
     if not invalid_backrest.empty:
         raise ValueError("Invalid rows found: backrest_height must be 0 when has_backrest is 0.")
 
 
 def ensure_output_path(output_path: str) -> None:
-    """Create output directories if they do not exist."""
+    """Creeaza directoarele de output daca nu exista."""
+    # Creeaza folderele parinte pentru output.
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
 
 def main() -> None:
-    """Generate dataset and save it to CSV."""
+    """Genereaza dataset-ul si il salveaza in CSV."""
+    # Construieste, valideaza si salveaza dataset-ul sintetic.
     set_random_seed(RANDOM_SEED)
 
     dataset = build_dataset(NUM_SAMPLES)

@@ -1,29 +1,34 @@
-"""Data cleaning for the synthetic chair dataset."""
+"""Curatare date pentru dataset-ul sintetic de scaune."""
 
 import os
 
 import pandas as pd
 
 
+# Cai pentru fisierul brut si pentru output-ul curatat.
 INPUT_PATH = os.path.join("data", "generated", "chairs_dataset.csv")
 OUTPUT_PATH = os.path.join("data", "processed", "chairs_clean.csv")
 
 
 def validate_dataset(df: pd.DataFrame) -> None:
-    """Validate dataset for missing or invalid values."""
+    """Valideaza dataset-ul pentru valori lipsa sau invalide."""
+    # Verificare simpla pentru valori lipsa.
     if df.isna().any().any():
         raise ValueError("Dataset contains missing values (NaN).")
 
+    # Regula de domeniu: backrest_height trebuie 0 cand has_backrest este 0.
     invalid_backrest = df[(df["has_backrest"] == 0) & (df["backrest_height"] > 0)]
     if not invalid_backrest.empty:
         raise ValueError("Invalid rows: backrest_height > 0 when has_backrest == 0.")
 
 
 def main() -> None:
-    """Load, validate, and save the cleaned dataset."""
+    """Incarca, valideaza si salveaza dataset-ul curatat."""
+    # Verifica existenta fisierului de intrare.
     if not os.path.exists(INPUT_PATH):
         raise FileNotFoundError(f"Input file not found: {INPUT_PATH}")
 
+    # Incarca, valideaza si salveaza dataset-ul curatat.
     df = pd.read_csv(INPUT_PATH)
     validate_dataset(df)
 

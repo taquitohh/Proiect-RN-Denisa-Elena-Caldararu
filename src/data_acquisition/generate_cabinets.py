@@ -1,6 +1,6 @@
-"""Generate a synthetic dataset for cabinet classification (Etapa 4).
+"""Genereaza dataset sintetic pentru clasificarea dulapurilor (Etapa 4).
 
-Labels:
+Etichete:
 0 = single_door, 1 = double_door, 2 = tall_cabinet
 """
 
@@ -12,6 +12,7 @@ import random
 import numpy as np
 import pandas as pd
 
+# Dimensiune dataset si seed pentru reproductibilitate.
 NUM_SAMPLES = 12000
 RANDOM_SEED = 42
 
@@ -23,11 +24,14 @@ DOOR_TYPE_OPTIONS = (0, 1)  # 0 = flush, 1 = inset
 DOOR_COUNT_OPTIONS = (1, 2)
 STYLE_VARIANT_OPTIONS = (0, 1, 2)
 
+# Initializeaza RNG-urile o singura data.
 random.seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
 
 def generate_sample() -> dict[str, float | int]:
+    """Genereaza un sample de dulap cu valori valide."""
+    # Genereaza valori in intervalele definite.
     cabinet_height = random.uniform(*CABINET_HEIGHT_RANGE)
     cabinet_width = random.uniform(*CABINET_WIDTH_RANGE)
     cabinet_depth = random.uniform(*CABINET_DEPTH_RANGE)
@@ -36,6 +40,7 @@ def generate_sample() -> dict[str, float | int]:
     door_count = random.choice(DOOR_COUNT_OPTIONS)
     style_variant = random.choice(STYLE_VARIANT_OPTIONS)
 
+    # Etichetare pe baza inaltimii si a numarului de usi.
     if cabinet_height > 1.8:
         label = 2
     elif door_count == 1:
@@ -56,6 +61,8 @@ def generate_sample() -> dict[str, float | int]:
 
 
 def main() -> None:
+    """Genereaza dataset-ul si il salveaza in CSV."""
+    # Genereaza dataset-ul sintetic si il salveaza in CSV.
     samples = [generate_sample() for _ in range(NUM_SAMPLES)]
     df = pd.DataFrame(samples)
 

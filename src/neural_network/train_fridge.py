@@ -1,4 +1,4 @@
-"""Training pipeline for the fridge model."""
+"""Pipeline de antrenare pentru modelul de frigidere."""
 
 from __future__ import annotations
 
@@ -17,6 +17,7 @@ import tensorflow as tf
 from src.neural_network.model import build_model
 
 
+# Cai pentru dataset si artefacte (model/rezultate).
 DATA_DIR = Path("data") / "fridges"
 MODELS_DIR = Path("models")
 RESULTS_DIR = Path("results")
@@ -26,7 +27,8 @@ METRICS_PATH = RESULTS_DIR / "fridge_training_metrics.json"
 
 
 def load_datasets() -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series]:
-    """Load train and validation datasets from CSV files."""
+    """Incarca dataset-urile train si validation din CSV."""
+    # Incarca features si label-uri pentru train/validation.
     x_train = pd.read_csv(DATA_DIR / "train" / "X_train.csv")
     y_train = pd.read_csv(DATA_DIR / "train" / "y_train.csv").squeeze()
     x_val = pd.read_csv(DATA_DIR / "validation" / "X_val.csv")
@@ -35,12 +37,14 @@ def load_datasets() -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series]:
 
 
 def train(epochs: int = 10, batch_size: int = 32) -> None:
-    """Train the fridge model and save outputs."""
+    """Antreneaza modelul de frigidere si salveaza output-urile."""
+    # Pregateste datele de antrenare si validare.
     x_train, y_train, x_val, y_val = load_datasets()
 
     input_dim = x_train.shape[1]
     num_classes = int(pd.Series(y_train).nunique())
 
+    # Construieste si compileaza modelul MLP.
     model = build_model(input_dim=input_dim, num_classes=num_classes)
 
     model.compile(
@@ -49,6 +53,7 @@ def train(epochs: int = 10, batch_size: int = 32) -> None:
         metrics=["accuracy"],
     )
 
+    # Antreneaza modelul si retine istoricul.
     history = model.fit(
         x_train,
         y_train,
@@ -61,11 +66,13 @@ def train(epochs: int = 10, batch_size: int = 32) -> None:
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
+    # Salveaza modelul si artefactele de antrenare.
     model.save(MODEL_PATH)
 
     history_df = pd.DataFrame(history.history)
     history_df.to_csv(HISTORY_PATH, index=False)
 
+    # Rezumat metrici finale pentru verificare rapida.
     metrics = {
         "train_accuracy": history.history.get("accuracy", [None])[-1],
         "train_loss": history.history.get("loss", [None])[-1],

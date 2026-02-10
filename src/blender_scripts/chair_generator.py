@@ -3,7 +3,7 @@ import textwrap
 
 
 def generate_chair_script(
-    seat_height: float,        # total height from floor to top of seat
+    seat_height: float,        # inaltime totala de la podea la sezut
     seat_width: float,
     seat_depth: float,
     leg_count: int,
@@ -14,8 +14,10 @@ def generate_chair_script(
     style_variant: int,
 ) -> str:
 
+    # Limiteaza inputurile pentru a pastra geometria stabila si predictibila.
+
     # -------------------------
-    # SAFETY / CLAMPS
+    # SIGURANTA / LIMITARI
     # -------------------------
     leg_count = max(3, min(5, int(leg_count)))
     has_backrest = 1 if int(has_backrest) == 1 else 0
@@ -23,11 +25,12 @@ def generate_chair_script(
 
     style_offset = {0: 0.0, 1: 0.02, 2: -0.02}.get(style_variant, 0.0)
 
+    # Construieste un script Blender cu pasi expliciti de geometrie.
     script = f"""
 import bpy
 
 # -------------------------
-# PARAMETERS
+# PARAMETRI
 # -------------------------
 seat_height = {seat_height}
 seat_width = {seat_width}
@@ -40,13 +43,13 @@ backrest_height = {backrest_height}
 style_offset = {style_offset}
 
 # -------------------------
-# CLEAN SCENE
+# CURATA SCENA (porneste de la o scena goala)
 # -------------------------
 bpy.ops.object.select_all(action='SELECT')
 bpy.ops.object.delete(use_global=False)
 
 # -------------------------
-# DERIVED DIMENSIONS
+# DERIVED DIMENSIONS (calculate din inputuri)
 # -------------------------
 seat_thickness = max(0.03, seat_height * 0.2)
 leg_height = max(0.01, seat_height - seat_thickness)
@@ -57,7 +60,7 @@ seat_bottom_z = leg_height
 seat_top_z = seat_bottom_z + seat_thickness
 
 # -------------------------
-# SEAT
+# SEZUT (suprafata principala)
 # -------------------------
 bpy.ops.mesh.primitive_cube_add(size=2)
 seat = bpy.context.active_object
@@ -74,7 +77,7 @@ seat.location = (
 )
 
 # -------------------------
-# LEG POSITIONS (true edge contact)
+# POZITII PICIOARE (contact exact cu marginea)
 # -------------------------
 x_offset = seat_width / 2.0 - leg_contact + style_offset
 y_offset = seat_depth / 2.0 - leg_contact + style_offset
@@ -89,7 +92,7 @@ leg_positions = [
 legs = []
 
 # -------------------------
-# LEGS (round or square, exact contact)
+# LEGS (rotunde sau patrate, contact exact)
 # -------------------------
 for idx, (x, y) in enumerate(leg_positions, start=1):
     if leg_shape == "round":
@@ -114,7 +117,7 @@ for idx, (x, y) in enumerate(leg_positions, start=1):
     legs.append(leg)
 
 # -------------------------
-# BACKREST (touches seat exactly)
+# SPATAR (atinge sezutul exact)
 # -------------------------
 if has_backrest == 1 and backrest_height > 0:
     backrest_thickness = leg_size
@@ -134,7 +137,7 @@ if has_backrest == 1 and backrest_height > 0:
     )
 
 # -------------------------
-# OPTIONAL: JOIN ALL PARTS
+# OPTIONAL: JOIN ALL PARTS (o singura plasa)
 # -------------------------
 join_objects = True
 if join_objects:

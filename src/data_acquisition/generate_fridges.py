@@ -1,4 +1,4 @@
-"""Generate a synthetic dataset for fridge classification."""
+"""Genereaza dataset sintetic pentru clasificarea frigiderelor."""
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ import random
 import numpy as np
 import pandas as pd
 
+# Dimensiune dataset si seed pentru reproductibilitate.
 NUM_SAMPLES = 12000
 RANDOM_SEED = 42
 
@@ -20,11 +21,14 @@ FREEZER_RATIO_RANGE = (0.25, 0.45)
 FREEZER_POSITION_OPTIONS = (0, 1)  # 0 = top freezer, 1 = bottom freezer
 STYLE_VARIANT_OPTIONS = (0, 1, 2)
 
+# Initializeaza RNG-urile o singura data.
 random.seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
 
 def generate_sample() -> dict[str, float | int]:
+    """Genereaza un sample de frigider cu valori valide."""
+    # Genereaza valori in intervalele definite.
     fridge_height = random.uniform(*FRIDGE_HEIGHT_RANGE)
     fridge_width = random.uniform(*FRIDGE_WIDTH_RANGE)
     fridge_depth = random.uniform(*FRIDGE_DEPTH_RANGE)
@@ -34,6 +38,7 @@ def generate_sample() -> dict[str, float | int]:
     freezer_position = random.choice(FREEZER_POSITION_OPTIONS)
     style_variant = random.choice(STYLE_VARIANT_OPTIONS)
 
+    # Etichetare in functie de pozitia congelatorului.
     label = 0 if freezer_position == 0 else 1
 
     return {
@@ -50,6 +55,8 @@ def generate_sample() -> dict[str, float | int]:
 
 
 def main() -> None:
+    """Genereaza dataset-ul si il salveaza in CSV."""
+    # Genereaza dataset-ul sintetic si il salveaza in CSV.
     samples = [generate_sample() for _ in range(NUM_SAMPLES)]
     df = pd.DataFrame(samples)
 

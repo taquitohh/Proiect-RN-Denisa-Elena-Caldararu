@@ -1,7 +1,7 @@
-"""Model definition for the chair type classifier (Etapa 4).
+"""Definirea modelului pentru clasificarea scaunelor (Etapa 4).
 
-This module exposes a single factory function, `build_model`, which returns a
-Keras MLP suitable for tabular, numeric inputs.
+Modulul expune o singura functie, `build_model`, care returneaza
+un MLP Keras potrivit pentru inputuri tabulare numerice.
 """
 
 from __future__ import annotations
@@ -10,15 +10,16 @@ import tensorflow as tf
 
 
 def build_model(input_dim: int = 8, num_classes: int = 4) -> tf.keras.Model:
-    """Create an MLP model for multi-class classification.
+    """Creeaza un MLP pentru clasificare multi-clasa.
 
     Args:
         input_dim: Number of input features.
         num_classes: Number of output classes.
 
     Returns:
-        A Keras Model instance.
+        Un model Keras.
     """
+    # MLP simplu pentru clasificare tabulara cu doua straturi ascunse.
     return tf.keras.Sequential(
         [
             tf.keras.layers.Input(shape=(input_dim,)),

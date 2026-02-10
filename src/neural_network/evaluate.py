@@ -1,9 +1,9 @@
-"""Evaluate trained RN model on the test set (Etapa 5.3).
+"""Evalueaza modelul RN pe test (Etapa 5.3).
 
-This script loads the trained model and the test dataset, runs inference,
-computes Accuracy and F1-score (macro), prints the metrics, and saves them
-in results/chair_test_metrics.json. It optionally saves a confusion matrix plot to
-`docs/confusion_matrix.png` if matplotlib is available.
+Scriptul incarca modelul si setul de test, ruleaza inferenta,
+calculeaza Accuracy si F1 macro, afiseaza metricile si le salveaza
+in results/chair_test_metrics.json. Optional salveaza matricea de confuzie
+in docs/confusion_matrix.png daca matplotlib este disponibil.
 """
 
 from __future__ import annotations
@@ -17,6 +17,7 @@ import pandas as pd
 import tensorflow as tf
 
 
+# Cai pentru inputuri si outputuri folosite la evaluare.
 DATA_DIR = Path("data") / "chairs"
 MODEL_PATH = Path("models") / "chair_model.h5"
 RESULTS_PATH = Path("results") / "chair_test_metrics.json"
@@ -24,14 +25,16 @@ CONFUSION_PATH = Path("docs") / "confusion_matrix.png"
 
 
 def load_test_data() -> Tuple[pd.DataFrame, pd.Series]:
-    """Load test dataset from CSV files."""
+    """Incarca setul de test din CSV."""
+    # Incarca features si label-uri din splitul de test.
     x_test = pd.read_csv(DATA_DIR / "test" / "X_test.csv")
     y_test = pd.read_csv(DATA_DIR / "test" / "y_test.csv").squeeze()
     return x_test, y_test
 
 
 def compute_f1_macro(y_true: np.ndarray, y_pred: np.ndarray, num_classes: int) -> float:
-    """Compute macro-averaged F1-score without external dependencies."""
+    """Calculeaza F1 macro fara dependinte externe."""
+    # Calculeaza F1 pe clasa si media macro.
     f1_scores = []
     for cls in range(num_classes):
         tp = np.sum((y_true == cls) & (y_pred == cls))
@@ -53,13 +56,15 @@ def compute_f1_macro(y_true: np.ndarray, y_pred: np.ndarray, num_classes: int) -
 
 
 def save_confusion_matrix(cm: np.ndarray) -> None:
-    """Save confusion matrix plot if matplotlib is available."""
+    """Salveaza matricea de confuzie daca matplotlib este disponibil."""
+    # Importa matplotlib doar daca este disponibil.
     try:
         import matplotlib.pyplot as plt
     except ImportError:
         print("matplotlib not available. Skipping confusion matrix plot.")
         return
 
+    # Randare heatmap cu etichete pentru matricea de confuzie.
     fig, ax = plt.subplots(figsize=(6, 5))
     im = ax.imshow(cm, interpolation="nearest", cmap="Blues")
     ax.figure.colorbar(im, ax=ax)
@@ -88,10 +93,12 @@ def save_confusion_matrix(cm: np.ndarray) -> None:
 
 
 def evaluate() -> None:
-    """Run inference on test set and compute evaluation metrics."""
+    """Ruleaza inferenta pe test si calculeaza metricile."""
+    # Incarca datele de test si modelul antrenat.
     x_test, y_test = load_test_data()
 
     model = tf.keras.models.load_model(MODEL_PATH)
+    # Prezice probabilitatile si extrage eticheta prezisa.
     probabilities = model.predict(x_test, verbose=0)
     y_pred = np.argmax(probabilities, axis=1)
 
@@ -104,6 +111,7 @@ def evaluate() -> None:
     print(f"Test Accuracy: {accuracy:.2f}")
     print(f"Test F1-score (macro): {f1_macro:.2f}")
 
+    # Salveaza metricile in JSON pentru documentatie.
     RESULTS_PATH.parent.mkdir(parents=True, exist_ok=True)
     with RESULTS_PATH.open("w", encoding="utf-8") as file:
         json.dump(
@@ -112,6 +120,7 @@ def evaluate() -> None:
             indent=2,
         )
 
+    # Construieste si salveaza matricea de confuzie.
     cm = np.zeros((num_classes, num_classes), dtype=int)
     for true_label, pred_label in zip(y_true, y_pred):
         cm[int(true_label), int(pred_label)] += 1

@@ -1,4 +1,4 @@
-"""Split the scaled table dataset into train/validation/test sets."""
+"""Imparte dataset-ul scalat in train/validation/test."""
 
 import os
 
@@ -6,6 +6,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 
+# Cai pentru input scalat si pentru folderele de split.
 INPUT_PATH = os.path.join("data", "processed", "tables_scaled.csv")
 TRAIN_DIR = os.path.join("data", "tables", "train")
 VAL_DIR = os.path.join("data", "tables", "validation")
@@ -15,14 +16,16 @@ RANDOM_STATE = 42
 
 
 def save_split(features: pd.DataFrame, labels: pd.Series, output_dir: str, prefix: str) -> None:
-    """Save features and labels to CSV files."""
+    """Salveaza features si label-uri in CSV."""
+    # Salveaza spliturile in format consistent pentru pipeline.
     os.makedirs(output_dir, exist_ok=True)
     features.to_csv(os.path.join(output_dir, f"X_{prefix}.csv"), index=False)
     labels.to_csv(os.path.join(output_dir, f"y_{prefix}.csv"), index=False)
 
 
 def main() -> None:
-    """Load scaled data, split it, and save CSV files."""
+    """Incarca datele scalate, le imparte si salveaza CSV-urile."""
+    # Verifica existenta dataset-ului scalat.
     if not os.path.exists(INPUT_PATH):
         raise FileNotFoundError(f"Input file not found: {INPUT_PATH}")
 
@@ -30,6 +33,7 @@ def main() -> None:
     X = df.drop(columns=["label"])
     y = df["label"]
 
+    # Primul split: train vs temp (val+test), cu stratificare.
     X_train, X_temp, y_train, y_temp = train_test_split(
         X,
         y,
@@ -38,6 +42,7 @@ def main() -> None:
         stratify=y,
     )
 
+    # Al doilea split: validation vs test, cu stratificare.
     X_val, X_test, y_val, y_test = train_test_split(
         X_temp,
         y_temp,

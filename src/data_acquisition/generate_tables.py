@@ -1,6 +1,6 @@
-"""Generate a synthetic dataset for table classification (Etapa 4).
+"""Genereaza dataset sintetic pentru clasificarea meselor (Etapa 4).
 
-Labels:
+Etichete:
 0 = low_table, 1 = dining_table, 2 = bar_table
 """
 
@@ -12,6 +12,7 @@ import random
 import numpy as np
 import pandas as pd
 
+# Dimensiune dataset si seed pentru reproductibilitate.
 NUM_SAMPLES = 12000
 RANDOM_SEED = 42
 
@@ -23,11 +24,14 @@ LEG_THICKNESS_RANGE = (0.04, 0.09)
 HAS_APRON_OPTIONS = (0, 1)
 STYLE_VARIANT_OPTIONS = (0, 1, 2)
 
+# Initializeaza RNG-urile o singura data.
 random.seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
 
 def generate_sample() -> dict[str, float | int]:
+    """Genereaza un sample de masa cu valori valide."""
+    # Genereaza valori in intervalele definite.
     table_height = random.uniform(*TABLE_HEIGHT_RANGE)
     table_width = random.uniform(*TABLE_WIDTH_RANGE)
     table_depth = random.uniform(*TABLE_DEPTH_RANGE)
@@ -36,6 +40,7 @@ def generate_sample() -> dict[str, float | int]:
     has_apron = random.choice(HAS_APRON_OPTIONS)
     style_variant = random.choice(STYLE_VARIANT_OPTIONS)
 
+    # Etichetare pe baza pragurilor de inaltime.
     if table_height < 0.45:
         label = 0
     elif table_height <= 0.75:
@@ -56,6 +61,8 @@ def generate_sample() -> dict[str, float | int]:
 
 
 def main() -> None:
+    """Genereaza dataset-ul si il salveaza in CSV."""
+    # Genereaza dataset-ul sintetic si il salveaza in CSV.
     samples = [generate_sample() for _ in range(NUM_SAMPLES)]
     df = pd.DataFrame(samples)
 

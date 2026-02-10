@@ -13,12 +13,15 @@ def generate_fridge_script(
     freezer_position: int,
     style_variant: int,
 ) -> str:
+    # Normalizeaza optiunile discrete la intervalele asteptate.
     freezer_position = 1 if int(freezer_position) == 1 else 0
     style_variant = int(style_variant)
 
+    # Construieste un script Blender cu pasi expliciti de geometrie.
     script = f"""
 import bpy
 
+# CURATA SCENA
 bpy.ops.object.select_all(action='SELECT')
 bpy.ops.object.delete(use_global=False)
 
@@ -31,7 +34,7 @@ freezer_ratio = {freezer_ratio}
 freezer_position = {freezer_position}
 style_variant = {style_variant}
 
-# CARCASS
+# CARCASA
 bpy.ops.mesh.primitive_cube_add(size=2)
 carcass = bpy.context.active_object
 carcass.name = "FridgeCarcass"
@@ -51,7 +54,7 @@ else:
     top_height = fridge_section_height
     bottom_height = freezer_height
 
-# DOOR PANELS
+# PANOURI USI
 bpy.ops.mesh.primitive_cube_add(size=2)
 top_door = bpy.context.active_object
 top_door.name = "TopDoor"
@@ -64,7 +67,7 @@ bottom_door.name = "BottomDoor"
 bottom_door.scale = (fridge_width / 2 - panel_gap, door_thickness / 2, bottom_height / 2 - panel_gap)
 bottom_door.location = (0, front_y + door_thickness / 2, bottom_height / 2)
 
-# HANDLES
+# MANERE
 handles = []
 handle_radius = max(0.01, door_thickness * 0.35)
 handle_x = fridge_width / 2 - panel_gap - handle_radius
@@ -84,7 +87,7 @@ handle_bottom.rotation_euler = (0.0, 0.0, 1.5708)
 handle_bottom.location = (handle_x, handle_y, bottom_height * 0.5)
 handles.append(handle_bottom)
 
-# JOIN
+# JOIN (uneste toate piesele intr-un singur obiect)
 bpy.ops.object.select_all(action='DESELECT')
 carcass.select_set(True)
 top_door.select_set(True)

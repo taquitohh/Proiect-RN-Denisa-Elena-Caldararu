@@ -12,13 +12,16 @@ def generate_cabinet_script(
     door_count: int,
     style_variant: int,
 ) -> str:
+    # Normalizeaza optiunile discrete la intervalele asteptate.
     door_type = 1 if int(door_type) == 1 else 0
     door_count = 1 if int(door_count) == 1 else 2
     style_variant = int(style_variant)
 
+    # Construieste un script Blender cu pasi expliciti de geometrie.
     script = f"""
 import bpy
 
+# CURATA SCENA
 bpy.ops.object.select_all(action='SELECT')
 bpy.ops.object.delete(use_global=False)
 
@@ -33,14 +36,14 @@ style_variant = {style_variant}
 front_offset = cabinet_depth / 2
 back_offset = -cabinet_depth / 2
 
-# CARCASS
+# CARCASA
 bpy.ops.mesh.primitive_cube_add(size=2)
 carcass = bpy.context.active_object
 carcass.name = "CabinetCarcass"
 carcass.scale = (cabinet_width / 2, cabinet_depth / 2, cabinet_height / 2)
 carcass.location = (0, 0, cabinet_height / 2)
 
-# DOORS
+# USI
 inset_gap = wall_thickness * 0.4
 frame_gap = wall_thickness * 0.2
 door_gap = max(0.002, wall_thickness * 0.15)
@@ -83,7 +86,7 @@ else:
         door.location = (x, door_center_y, cabinet_height / 2)
         doors.append(door)
 
-# HANDLES
+# MANERE
 handles = []
 handle_radius = max(0.005, wall_thickness * 0.25)
 handle_length = max(0.03, wall_thickness * 1.5)
@@ -108,7 +111,7 @@ else:
         handle.location = (x, handle_y, handle_z)
         handles.append(handle)
 
-# JOIN
+# JOIN (uneste toate piesele intr-un singur obiect)
 bpy.ops.object.select_all(action='DESELECT')
 carcass.select_set(True)
 for door in doors:

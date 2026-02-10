@@ -1,4 +1,4 @@
-"""Generate a synthetic dataset for stove classification."""
+"""Genereaza dataset sintetic pentru clasificarea plitelor."""
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ import random
 import numpy as np
 import pandas as pd
 
+# Dimensiune dataset si seed pentru reproductibilitate.
 NUM_SAMPLES = 12000
 RANDOM_SEED = 42
 
@@ -19,11 +20,14 @@ HANDLE_LENGTH_RANGE = (0.35, 0.65)
 GLASS_THICKNESS_RANGE = (0.01, 0.03)
 STYLE_VARIANT_OPTIONS = (0, 1, 2)
 
+# Initializeaza RNG-urile o singura data.
 random.seed(RANDOM_SEED)
 np.random.seed(RANDOM_SEED)
 
 
 def generate_sample() -> dict[str, float | int]:
+    """Genereaza un sample de plita cu valori valide."""
+    # Genereaza valori in intervalele definite.
     stove_height = random.uniform(*STOVE_HEIGHT_RANGE)
     stove_width = random.uniform(*STOVE_WIDTH_RANGE)
     stove_depth = random.uniform(*STOVE_DEPTH_RANGE)
@@ -32,6 +36,7 @@ def generate_sample() -> dict[str, float | int]:
     glass_thickness = random.uniform(*GLASS_THICKNESS_RANGE)
     style_variant = random.choice(STYLE_VARIANT_OPTIONS)
 
+    # Etichetare pe baza pragurilor de grosime a sticlei.
     if glass_thickness < 0.017:
         label = 0
     elif glass_thickness <= 0.024:
@@ -54,6 +59,8 @@ def generate_sample() -> dict[str, float | int]:
 
 
 def main() -> None:
+    """Genereaza dataset-ul si il salveaza in CSV."""
+    # Genereaza dataset-ul sintetic si il salveaza in CSV.
     samples = [generate_sample() for _ in range(NUM_SAMPLES)]
     df = pd.DataFrame(samples)
 

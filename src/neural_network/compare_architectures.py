@@ -1,4 +1,4 @@
-"""Compare multiple MLP architectures on the chair dataset (Etapa 5/6)."""
+"""Compara mai multe arhitecturi MLP pe dataset-ul de scaune (Etapa 5/6)."""
 
 from __future__ import annotations
 
@@ -12,6 +12,7 @@ import pandas as pd
 import tensorflow as tf
 
 
+# Radacina pentru dataset-urile chair.
 DATA_DIR = Path("data") / "chairs"
 
 
@@ -25,6 +26,8 @@ class ExperimentResult:
 
 
 def load_datasets() -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series, pd.DataFrame, pd.Series]:
+    """Incarca spliturile train/validation/test din CSV."""
+    # Incarca spliturile train/validation/test.
     x_train = pd.read_csv(DATA_DIR / "train" / "X_train.csv")
     y_train = pd.read_csv(DATA_DIR / "train" / "y_train.csv").squeeze()
     x_val = pd.read_csv(DATA_DIR / "validation" / "X_val.csv")
@@ -35,6 +38,8 @@ def load_datasets() -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series, p
 
 
 def augment_tabular(x_train: pd.DataFrame, y_train: pd.Series) -> Tuple[pd.DataFrame, pd.Series]:
+    """Aplica zgomot gaussian usor doar pe coloane continue."""
+    # Adauga zgomot gaussian doar pe feature-urile continue.
     continuous_cols = [
         "seat_height",
         "seat_width",
@@ -57,6 +62,8 @@ def augment_tabular(x_train: pd.DataFrame, y_train: pd.Series) -> Tuple[pd.DataF
 
 
 def build_variant(name: str, input_dim: int, num_classes: int) -> tf.keras.Model:
+    """Construieste un model pentru varianta ceruta."""
+    # Mapare intre numele variantei si dimensiunile straturilor ascunse.
     if name == "baseline_32_16":
         hidden = [32, 16]
     elif name == "narrow_16_8":
@@ -76,6 +83,8 @@ def build_variant(name: str, input_dim: int, num_classes: int) -> tf.keras.Model
 
 
 def compute_f1_macro(y_true: np.ndarray, y_pred: np.ndarray, num_classes: int) -> float:
+    """Calculeaza F1 macro pentru clasificare multi-clasa."""
+    # Calculeaza F1 pe clasa si media macro.
     f1_scores = []
     for cls in range(num_classes):
         tp = np.sum((y_true == cls) & (y_pred == cls))
@@ -94,6 +103,8 @@ def compute_f1_macro(y_true: np.ndarray, y_pred: np.ndarray, num_classes: int) -
 
 
 def run_experiment(name: str) -> ExperimentResult:
+    """Ruleaza un experiment complet pentru o varianta de arhitectura."""
+    # Antreneaza si evalueaza o varianta de arhitectura cap-coada.
     x_train, y_train, x_val, y_val, x_test, y_test = load_datasets()
     x_train, y_train = augment_tabular(x_train, y_train)
 
@@ -101,17 +112,20 @@ def run_experiment(name: str) -> ExperimentResult:
     num_classes = int(pd.Series(y_train).nunique())
 
     model = build_variant(name, input_dim, num_classes)
+    # Compileaza cu acelasi optimizer si loss pentru comparatie corecta.
     model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
         loss="sparse_categorical_crossentropy",
         metrics=["accuracy"],
     )
 
+    # Foloseste early stopping si scheduler pentru stabilitate.
     callbacks = [
         tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=5, restore_best_weights=True),
         tf.keras.callbacks.ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=3, min_lr=1e-5),
     ]
 
+    # Masoara timpul de antrenare pentru comparatie.
     start = time.perf_counter()
     model.fit(
         x_train,
@@ -124,6 +138,7 @@ def run_experiment(name: str) -> ExperimentResult:
     )
     train_seconds = time.perf_counter() - start
 
+    # Prezice pe test pentru a calcula metricile finale.
     probabilities = model.predict(x_test, verbose=0)
     y_pred = np.argmax(probabilities, axis=1)
     y_true = y_test.to_numpy()
@@ -142,6 +157,8 @@ def run_experiment(name: str) -> ExperimentResult:
 
 
 def main() -> None:
+    """Ruleaza toate variantele si afiseaza metricile."""
+    # Ruleaza toate variantele si afiseaza metricile.
     variants = ["baseline_32_16", "narrow_16_8", "wider_64_32", "deeper_64_32_16"]
     results: List[ExperimentResult] = [run_experiment(name) for name in variants]
     for res in results:
