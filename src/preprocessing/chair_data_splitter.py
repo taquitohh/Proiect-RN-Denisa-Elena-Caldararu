@@ -17,6 +17,15 @@ RANDOM_STATE = 42
 
 def save_split(features: pd.DataFrame, labels: pd.Series, output_dir: str, prefix: str) -> None:
     """Salveaza features si label-uri in CSV."""
+
+# Nota:
+# - Foloseste path-uri relative la repo definite in acest modul.
+# - Este destinat folosirii in pipeline-ul proiectului.
+# - Genereaza artefacte in folderele proiectului cand este cazul.
+# - Presupune schema de intrare din data/README.md (cand este cazul).
+# - Determinismul este aplicat cand exista un seed definit.
+# - Pastreaza output-ul in consola minim pentru claritate.
+
     # Salveaza spliturile in format consistent pentru pipeline.
     os.makedirs(output_dir, exist_ok=True)
     features.to_csv(os.path.join(output_dir, f"X_{prefix}.csv"), index=False)

@@ -4,6 +4,15 @@ Modulul expune o singura functie, `build_model`, care returneaza
 un MLP Keras potrivit pentru inputuri tabulare numerice.
 """
 
+# Nota:
+# - Foloseste path-uri relative la repo definite in acest modul.
+# - Este destinat folosirii in pipeline-ul proiectului.
+# - Genereaza artefacte in folderele proiectului cand este cazul.
+# - Presupune schema de intrare din data/README.md (cand este cazul).
+# - Determinismul este aplicat cand exista un seed definit.
+# - Pastreaza output-ul in consola minim pentru claritate.
+
+
 from __future__ import annotations
 
 import tensorflow as tf
@@ -12,11 +21,11 @@ import tensorflow as tf
 def build_model(input_dim: int = 8, num_classes: int = 4) -> tf.keras.Model:
     """Creeaza un MLP pentru clasificare multi-clasa.
 
-    Args:
-        input_dim: Number of input features.
-        num_classes: Number of output classes.
+    Argumente:
+        input_dim: Numarul de feature-uri de intrare.
+        num_classes: Numarul de clase la iesire.
 
-    Returns:
+    Returneaza:
         Un model Keras.
     """
     # MLP simplu pentru clasificare tabulara cu doua straturi ascunse.

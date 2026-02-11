@@ -78,13 +78,22 @@ BLENDER_API_URL = os.environ.get("BLENDER_API_URL", "http://127.0.0.1:5001/rende
 
 
 def load_scaler(path: str):
-    """Load the preprocessing scaler from disk."""
+    """Incarca scaler-ul de preprocesare de pe disc."""
+
+# Nota:
+# - Foloseste path-uri relative la repo definite in acest modul.
+# - Este destinat folosirii in pipeline-ul proiectului.
+# - Genereaza artefacte in folderele proiectului cand este cazul.
+# - Presupune schema de intrare din data/README.md (cand este cazul).
+# - Determinismul este aplicat cand exista un seed definit.
+# - Pastreaza output-ul in consola minim pentru claritate.
+
     with open(path, "rb") as file_handle:
         return pickle.load(file_handle)
 
 
 def load_model(path: str) -> keras.Model:
-    """Load the trained Keras model from disk."""
+    """Incarca modelul Keras antrenat de pe disc."""
     return keras.models.load_model(path)
 
 
@@ -93,7 +102,7 @@ ARTIFACT_CACHE: dict[str, tuple[keras.Model, object]] = {}
 
 
 def load_artifacts(object_type: str) -> tuple[keras.Model, object]:
-    """Load model and scaler on demand for a given object type."""
+    """Incarca modelul si scaler-ul la cerere pentru un tip de obiect."""
     # Returneaza din cache daca artefactele sunt deja incarcate.
     if object_type in ARTIFACT_CACHE:
         return ARTIFACT_CACHE[object_type]
@@ -184,7 +193,7 @@ FEATURE_COLUMNS = {
 
 
 def build_input_array(object_type: str, values: dict) -> pd.DataFrame:
-    """Build a DataFrame with feature names to match scaler training."""
+    """Construieste un DataFrame cu numele de feature-uri pentru scaler."""
     # Mapeaza inputurile UI in ordinea asteptata de model.
     if object_type == "table":
         row = {

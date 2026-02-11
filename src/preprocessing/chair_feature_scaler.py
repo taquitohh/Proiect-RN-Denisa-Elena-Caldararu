@@ -15,6 +15,15 @@ SCALER_PATH = os.path.join("config", "chair_scaler.pkl")
 
 def main() -> None:
     """Scaleaza features cu StandardScaler si salveaza output-urile."""
+
+# Nota:
+# - Foloseste path-uri relative la repo definite in acest modul.
+# - Este destinat folosirii in pipeline-ul proiectului.
+# - Genereaza artefacte in folderele proiectului cand este cazul.
+# - Presupune schema de intrare din data/README.md (cand este cazul).
+# - Determinismul este aplicat cand exista un seed definit.
+# - Pastreaza output-ul in consola minim pentru claritate.
+
     # Verifica existenta dataset-ului curatat inainte de scalare.
     if not os.path.exists(INPUT_PATH):
         raise FileNotFoundError(f"Input file not found: {INPUT_PATH}")

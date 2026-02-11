@@ -20,6 +20,15 @@ DATA_PATH = Path("data") / "chairs" / "test" / "X_test.csv"
 
 def export_model() -> None:
     """Exporta modelul Keras in format ONNX."""
+
+# Nota:
+# - Foloseste path-uri relative la repo definite in acest modul.
+# - Este destinat folosirii in pipeline-ul proiectului.
+# - Genereaza artefacte in folderele proiectului cand este cazul.
+# - Presupune schema de intrare din data/README.md (cand este cazul).
+# - Determinismul este aplicat cand exista un seed definit.
+# - Pastreaza output-ul in consola minim pentru claritate.
+
     # Incarca modelul Keras si asigura iesirea definita.
     model = tf.keras.models.load_model(MODEL_PATH)
     input_dim = model.input_shape[1]

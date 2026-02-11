@@ -3,6 +3,8 @@ numpy==1.26.4
 pandas
 scikit-learn
 tensorflow
+matplotlib
+pillow
 tf2onnx==1.16.1
 onnx
 onnxruntime

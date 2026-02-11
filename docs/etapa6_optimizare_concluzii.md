@@ -446,15 +446,17 @@ După primirea feedback-ului de la evaluatori, voi:
 ```
 Proiect-RN-Denisa-Elena-Caldararu/
 ├── README.md
-├── etapa3_analiza_date.md
-├── etapa4_arhitectura_sia.md
-├── etapa5_antrenare_model.md
-├── etapa6_optimizare_concluzii.md
 ├── ORDERINE_RULARE.txt
 ├── docs/
+│   ├── etapa3_analiza_date.md
+│   ├── etapa4_arhitectura_sia.md
+│   ├── etapa5_antrenare_model.md
+│   ├── etapa6_optimizare_concluzii.md
 │   ├── state_machine.png
+│   ├── state_machine_v2.png
 │   ├── loss_curve.png
 │   ├── confusion_matrix_optimized.png
+│   ├── demo/
 │   ├── screenshots/
 │   ├── results/
 │   └── optimization/
@@ -615,7 +617,7 @@ python src/neural_network/export_onnx.py
 - [x] `docs/state_machine.*` actualizat pentru a reflecta versiunea finală
 
 ### Pre-Predare
-- [x] `etapa6_optimizare_concluzii.md` completat cu TOATE secțiunile
+- [x] `docs/etapa6_optimizare_concluzii.md` completat cu TOATE secțiunile
 - [x] Structură repository conformă modelului de mai sus
 - [x] Commit: `"Etapa 6 completă – Accuracy=0.9911, F1=0.9915"`
 - [x] Tag: `git tag -a v0.6-final -m "Etapa 6 - Concluzii"`
@@ -628,7 +630,7 @@ python src/neural_network/export_onnx.py
 
 Asigurați-vă că următoarele fișiere există și sunt completate:
 
-1. **`etapa6_optimizare_concluzii.md`** (acest fișier) cu:
+1. **`docs/etapa6_optimizare_concluzii.md`** (acest fișier) cu:
    - Tabel experimente optimizare (minimum 4)
    - Tabel modificări aplicație software
    - Analiză confusion matrix

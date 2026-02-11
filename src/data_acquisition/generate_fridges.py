@@ -28,6 +28,15 @@ np.random.seed(RANDOM_SEED)
 
 def generate_sample() -> dict[str, float | int]:
     """Genereaza un sample de frigider cu valori valide."""
+
+# Nota:
+# - Foloseste path-uri relative la repo definite in acest modul.
+# - Este destinat folosirii in pipeline-ul proiectului.
+# - Genereaza artefacte in folderele proiectului cand este cazul.
+# - Presupune schema de intrare din data/README.md (cand este cazul).
+# - Determinismul este aplicat cand exista un seed definit.
+# - Pastreaza output-ul in consola minim pentru claritate.
+
     # Genereaza valori in intervalele definite.
     fridge_height = random.uniform(*FRIDGE_HEIGHT_RANGE)
     fridge_width = random.uniform(*FRIDGE_WIDTH_RANGE)

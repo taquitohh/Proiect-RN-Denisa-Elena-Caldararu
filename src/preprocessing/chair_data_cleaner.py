@@ -12,6 +12,15 @@ OUTPUT_PATH = os.path.join("data", "processed", "chairs_clean.csv")
 
 def validate_dataset(df: pd.DataFrame) -> None:
     """Valideaza dataset-ul pentru valori lipsa sau invalide."""
+
+# Nota:
+# - Foloseste path-uri relative la repo definite in acest modul.
+# - Este destinat folosirii in pipeline-ul proiectului.
+# - Genereaza artefacte in folderele proiectului cand este cazul.
+# - Presupune schema de intrare din data/README.md (cand este cazul).
+# - Determinismul este aplicat cand exista un seed definit.
+# - Pastreaza output-ul in consola minim pentru claritate.
+
     # Verificare simpla pentru valori lipsa.
     if df.isna().any().any():
         raise ValueError("Dataset contains missing values (NaN).")

@@ -296,15 +296,17 @@ Structura reala din proiect este:
 ```
 Proiect-RN-Denisa-Elena-Caldararu/
 ├── README.md
-├── etapa3_analiza_date.md
-├── etapa4_arhitectura_sia.md
-├── etapa5_antrenare_model.md
-├── etapa6_optimizare_concluzii.md
 ├── ORDERINE_RULARE.txt
 ├── docs/
+│   ├── etapa3_analiza_date.md
+│   ├── etapa4_arhitectura_sia.md
+│   ├── etapa5_antrenare_model.md
+│   ├── etapa6_optimizare_concluzii.md
 │   ├── state_machine.png
+│   ├── state_machine_v2.png
 │   ├── confusion_matrix_optimized.png
 │   ├── loss_curve.png
+│   ├── demo/
 │   └── screenshots/
 ├── data/
 │   ├── README.md

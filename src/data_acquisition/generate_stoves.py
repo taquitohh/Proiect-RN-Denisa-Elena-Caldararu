@@ -27,6 +27,15 @@ np.random.seed(RANDOM_SEED)
 
 def generate_sample() -> dict[str, float | int]:
     """Genereaza un sample de plita cu valori valide."""
+
+# Nota:
+# - Foloseste path-uri relative la repo definite in acest modul.
+# - Este destinat folosirii in pipeline-ul proiectului.
+# - Genereaza artefacte in folderele proiectului cand este cazul.
+# - Presupune schema de intrare din data/README.md (cand este cazul).
+# - Determinismul este aplicat cand exista un seed definit.
+# - Pastreaza output-ul in consola minim pentru claritate.
+
     # Genereaza valori in intervalele definite.
     stove_height = random.uniform(*STOVE_HEIGHT_RANGE)
     stove_width = random.uniform(*STOVE_WIDTH_RANGE)

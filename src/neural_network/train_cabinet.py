@@ -28,6 +28,15 @@ METRICS_PATH = RESULTS_DIR / "cabinet_training_metrics.json"
 
 def load_datasets() -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series]:
     """Incarca dataset-urile train si validation din CSV."""
+
+# Nota:
+# - Foloseste path-uri relative la repo definite in acest modul.
+# - Este destinat folosirii in pipeline-ul proiectului.
+# - Genereaza artefacte in folderele proiectului cand este cazul.
+# - Presupune schema de intrare din data/README.md (cand este cazul).
+# - Determinismul este aplicat cand exista un seed definit.
+# - Pastreaza output-ul in consola minim pentru claritate.
+
     # Incarca features si label-uri pentru train/validation.
     x_train = pd.read_csv(DATA_DIR / "train" / "X_train.csv")
     y_train = pd.read_csv(DATA_DIR / "train" / "y_train.csv").squeeze()

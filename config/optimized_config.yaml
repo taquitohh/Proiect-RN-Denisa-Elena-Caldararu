@@ -1,0 +1,36 @@
+model:
+  type: mlp
+  input_dim: 8
+  hidden_layers:
+    - 32
+    - 16
+  output_classes: 4
+  activation_hidden: relu
+  activation_output: softmax
+
+training:
+  epochs: 10
+  batch_size: 32
+  optimizer: Adam
+  learning_rate: 0.001
+  loss: sparse_categorical_crossentropy
+  metrics:
+    - accuracy
+
+callbacks:
+  early_stopping:
+    monitor: val_loss
+    patience: 5
+    restore_best_weights: true
+  reduce_lr_on_plateau:
+    monitor: val_loss
+    factor: 0.5
+    patience: 3
+    min_lr: 1.0e-5
+
+data:
+  dataset: chairs
+  train_path: data/chairs/train
+  val_path: data/chairs/validation
+  test_path: data/chairs/test
+  scaler_path: config/chair_scaler.pkl

@@ -6,6 +6,15 @@ in results/chair_test_metrics.json. Optional salveaza matricea de confuzie
 in docs/confusion_matrix_optimized.png daca matplotlib este disponibil.
 """
 
+# Nota:
+# - Foloseste path-uri relative la repo definite in acest modul.
+# - Este destinat folosirii in pipeline-ul proiectului.
+# - Genereaza artefacte in folderele proiectului cand este cazul.
+# - Presupune schema de intrare din data/README.md (cand este cazul).
+# - Determinismul este aplicat cand exista un seed definit.
+# - Pastreaza output-ul in consola minim pentru claritate.
+
+
 from __future__ import annotations
 
 import json
@@ -61,7 +70,7 @@ def save_confusion_matrix(cm: np.ndarray) -> None:
     try:
         import matplotlib.pyplot as plt
     except ImportError:
-        print("matplotlib not available. Skipping confusion matrix plot.")
+        print("matplotlib nu este disponibila. Se sare peste graficul de confuzie.")
         return
 
     # Randare heatmap cu etichete pentru matricea de confuzie.
@@ -69,9 +78,9 @@ def save_confusion_matrix(cm: np.ndarray) -> None:
     im = ax.imshow(cm, interpolation="nearest", cmap="Blues")
     ax.figure.colorbar(im, ax=ax)
     ax.set(
-        xlabel="Predicted label",
-        ylabel="True label",
-        title="Confusion Matrix",
+        xlabel="Eticheta prezisa",
+        ylabel="Eticheta reala",
+        title="Matrice de confuzie",
     )
 
     thresh = cm.max() / 2 if cm.max() > 0 else 0
