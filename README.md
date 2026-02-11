@@ -475,7 +475,7 @@ validata mai bine scenariul industrial si pentru a oferi o dovada vizuala comple
 2. TensorFlow API, 2024. https://www.tensorflow.org/api_docs
 3. Scikit-learn Metrics, 2024. https://scikit-learn.org/stable/modules/model_evaluation.html
 4. Blender Python API, 2024. https://docs.blender.org/api/current/
-5. Curs Retele Neuronale in cadrum UNSTPB, Conf.dr.ing. Bogdan ABAZA, 2025-2026.
+5. Curs Retele Neuronale UNSTPB, Conf.dr.ing. Bogdan ABAZA, 2025-2026.
 
 ---
 
