@@ -3,7 +3,7 @@
 **Disciplina:** Rețele Neuronale  
 **Instituție:** POLITEHNICA București – FIIR  
 **Student:** Caldararu Denisa Elena  
-**Link Repository GitHub:** https://github.com/taquitohh/Proiect_RN  
+**Link Repository GitHub:** https://github.com/taquitohh/Proiect-RN-Denisa-Elena-Caldararu  
 **Data predării:** 10.01.2026
 
 ---
@@ -294,8 +294,9 @@ Măsuri corective:
 Structura reala din proiect este:
 
 ```
-Proiect_RN/
-├── README – Etapa 3 -Analiza si Pregatirea Setului de Date pentru Retele Neuronale.md
+Proiect-RN-Denisa-Elena-Caldararu/
+├── README.md
+├── etapa3_analiza_date.md
 ├── etapa4_arhitectura_sia.md
 ├── etapa5_antrenare_model.md
 ├── etapa6_optimizare_concluzii.md

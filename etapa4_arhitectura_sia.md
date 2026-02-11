@@ -3,7 +3,7 @@
 **Disciplina:** Rețele Neuronale  
 **Instituție:** POLITEHNICA București – FIIR  
 **Student:** Caldararu Denisa Elena  
-**Link Repository GitHub:** https://github.com/taquitohh/Proiect_RN  
+**Link Repository GitHub:** https://github.com/taquitohh/Proiect-RN-Denisa-Elena-Caldararu  
 **Data:** 03.12.2025  
 ---
 
