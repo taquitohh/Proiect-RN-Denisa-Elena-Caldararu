@@ -113,5 +113,3 @@ REZUMAT (fisiere cheie)
 - UI: src/app/main.py
 - Blender generator: src/blender_scripts/chair_generator.py
 - Blender API: src/blender_api/server.py
-
-Daca vrei o varianta mai scurta sau o schema grafica, spune-mi.
