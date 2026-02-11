@@ -521,4 +521,4 @@ validata mai bine scenariul industrial si pentru a oferi o dovada vizuala comple
 
 **Versiune document:** FINAL pentru examen  
 **Ultima actualizare:** 11.02.2026  
-**Tag Git:** `v0.6-optimized-final` (n/a - necreat)
+**Tag Git:** `v0.6-optimized-final` (creat si pushed)
